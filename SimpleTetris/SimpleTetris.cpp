@@ -1,6 +1,5 @@
 ﻿#include "SimpleTetris.h"
 
-
 fs::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
 {
 	__noop;
@@ -310,6 +309,16 @@ void fs::SimpleTetris::move(EDirection _eDirection)
 		{
 			_currPos.y += 1;
 		}
+		else
+		{
+			drawBlockToBoard(_currBlockType, _currPos, _currdir);
+
+			_currdir = EDirection::N;
+			_currPos.x = (kBoardSize.x / 2 - kBlockContainerSize / 2);
+			_currPos.y = -(kBlockContainerSize / 2);
+
+
+		}
 		break;
 	case fs::EDirection::W:
 		if (canDrawBlock(_currBlockType, _currPos - Position2(1, 0), _currdir) == true)
@@ -448,8 +457,8 @@ void fs::SimpleTetris::drawBlockToBoard(EBlockType _eBlockType, const Position2&
 			const int32 finalY{ y + y_ };
 			const uint8 blockValue{ block.data[y_][x_] };
 			if (blockValue == 0) continue;
-			if (finalY < 0 || finalY >= (uint32)kBoardSize.y) continue;
-			if (finalX < 0 || finalX >= (uint32)kBoardSize.x) continue;
+			if (finalY < 0 || finalY >= (int32)kBoardSize.y) continue;
+			if (finalX < 0 || finalX >= (int32)kBoardSize.x) continue;
 			_aaBoard[finalY][finalX] = blockType;
 		}
 	}
@@ -469,8 +478,8 @@ bool fs::SimpleTetris::canDrawBlock(EBlockType _eBlockType, const Position2& pos
 			const int32 finalY{ y + y_ };
 			const uint8 blockValue{ block.data[y_][x_] };
 			if (blockValue == 0) continue;
-			if (finalY >= (uint32)kBoardSize.y) return false;
-			if (finalX < 0 || finalX >= (uint32)kBoardSize.x) return false;
+			if (finalY >= (int32)kBoardSize.y) return false;
+			if (finalX < 0 || finalX >= (int32)kBoardSize.x) return false;
 
 			if (_aaBoard[finalY][finalX] != 0)
 			{
@@ -479,4 +488,36 @@ bool fs::SimpleTetris::canDrawBlock(EBlockType _eBlockType, const Position2& pos
 		}
 	}
 	return true;
+}
+
+void fs::SimpleTetris::setTimerInterval(int32 interval)
+{
+	if (interval <= kTimerIntervalMin)
+	{
+		interval = kTimerIntervalMin;
+	}
+	_timerInterval = interval;
+
+}
+
+fs::int32 fs::SimpleTetris::getTimerInterval() const
+{
+	return _timerInterval;
+}
+
+bool fs::SimpleTetris::tickTimer() const
+{
+	using namespace std::chrono;
+
+	//현재 시간을 가져온다.
+	auto elapsed = duration_cast<milliseconds>(steady_clock::now() - _prevTime);
+
+	if (elapsed.count() >= _timerInterval)
+	{
+		_prevTime = steady_clock::now();
+
+		return true;
+	}
+
+	return false;
 }

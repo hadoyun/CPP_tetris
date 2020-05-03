@@ -95,11 +95,19 @@ namespace fs
 		bool canDrawBlock(EBlockType _eBlockType, const Position2& position, EDirection _eDirect) const;
 		
 	public:
+		void setTimerInterval(int32 interval);
+		int32 getTimerInterval() const;
+		bool tickTimer() const; 
+
+	public:
 		static constexpr Size2	kBlockSize{ 24, 24 }; // 블록 하나의 크기 
-		static constexpr float	kBlockBorder{ 2 }; // 블록 하나의 둘레 
+		static constexpr float	kBlockBorder{ 4 }; // 블록 하나의 둘레 
 		static constexpr Size2	kBoardSize{ 10, 20 }; // board의 크기 
 		static constexpr Size2	kBoardSizePixel{ kBlockSize * kBoardSize }; //보드의 전체 픽셀 지정
+		static constexpr int32	kBlockContainerSize{ 4 }; 
 
+
+		static constexpr int32	kTimerIntervalMin { 100 }; // 블록 하나의 둘레 
 	// ii == image index
 	private:
 		uint32					_iiBlocks[(uint32)EBlockType::MAX]{};
@@ -110,5 +118,9 @@ namespace fs
 	private:
 		uint8					_aaBoard[(uint32)kBlockSize.y][(uint32)kBlockSize.x]{};
 		BlockContainer			_blocks[(int)fs::EBlockType::MAX][(int)EDirection::MAX]{};
+
+	private:
+		int32					_timerInterval{ 1000 }; // 1000 ms == 1 s
+		mutable std::chrono::steady_clock::time_point _prevTime{};
 	};
 }

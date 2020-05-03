@@ -38,7 +38,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 			if (GetAsyncKeyState(VK_UP) == (short)0x8001)
 			{
-				g_simpleTetris.move(EDirection::N);
+				//g_simpleTetris.move(EDirection::N);
+				g_simpleTetris.rotate();
 			}
 			if (GetAsyncKeyState(VK_DOWN) == (short)0x8001)
 			{
@@ -46,20 +47,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 			if (GetAsyncKeyState(VK_SPACE) == (short)0x8001)
 			{
-				g_simpleTetris.rotate();
+				for (int i = 0; i < SimpleTetris::kBlockSize.y; ++i)
+				{
+					g_simpleTetris.move(EDirection::S);
+				}
+				//g_simpleTetris.rotate();
 			}
 			if (GetAsyncKeyState('Q') == (short)0x8001)
 			{
 				auto currBlockType = g_simpleTetris.getCurrentBlockType();
 
-				uint32 iCurrBlockType = (uint32)currBlockType + 1;
+				uint32 iNextBlockType = (uint32)currBlockType + 1;
 
-				if (iCurrBlockType >= (uint32)EBlockType::MAX)
+				if (iNextBlockType >= (uint32)EBlockType::MAX)
 				{
-					iCurrBlockType = 2;
+					iNextBlockType = 2;
 				}
 
-				g_simpleTetris.setCurrentBlockType((EBlockType)iCurrBlockType);
+				g_simpleTetris.setCurrentBlockType((EBlockType)iNextBlockType);
+			}
+			if (GetAsyncKeyState('W') == (short)0x8001)
+			{
+				auto timerInterval = g_simpleTetris.getTimerInterval();
+
+				g_simpleTetris.setTimerInterval(timerInterval - 50);
+			}
+			if (g_simpleTetris.tickTimer() == true)
+			{
+				g_simpleTetris.move(EDirection::S);
 			}
 		}
 
@@ -74,9 +89,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				EHorzAlign::Center, EVertAlign::Center); // 텍스트 그리기 
 
 			g_simpleTetris.useFont(0); 
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 120, 0), L"FPS: " + g_simpleTetris.getFpsWstring(), fpsColor);
+			g_simpleTetris.drawTextToScreen(Position2(kWidth - 110, 0), L"FPS: " + g_simpleTetris.getFpsWstring(), fpsColor);
 			
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 120, 20), L"POS: " 
+			g_simpleTetris.drawTextToScreen(Position2(kWidth - 110, 20), L"POS: " 
 				+ std::to_wstring((int)g_simpleTetris.getCurrPos().x)
 				+ L","
 				+ std::to_wstring((int)g_simpleTetris.getCurrPos().y), Color(0,0,0));
