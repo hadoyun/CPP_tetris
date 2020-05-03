@@ -48,6 +48,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			{
 				g_simpleTetris.rotate();
 			}
+			if (GetAsyncKeyState('Q') == (short)0x8001)
+			{
+				auto currBlockType = g_simpleTetris.getCurrentBlockType();
+
+				uint32 iCurrBlockType = (uint32)currBlockType + 1;
+
+				if (iCurrBlockType >= (uint32)EBlockType::MAX)
+				{
+					iCurrBlockType = 2;
+				}
+
+				g_simpleTetris.setCurrentBlockType((EBlockType)iCurrBlockType);
+			}
 		}
 
 		g_simpleTetris.beginRendering(clearColor);
@@ -61,9 +74,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				EHorzAlign::Center, EVertAlign::Center); // 텍스트 그리기 
 
 			g_simpleTetris.useFont(0); 
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 100, 0), L"FPS: " + g_simpleTetris.getFpsWstring(), fpsColor);
+			g_simpleTetris.drawTextToScreen(Position2(kWidth - 120, 0), L"FPS: " + g_simpleTetris.getFpsWstring(), fpsColor);
 			
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 100, 20), L"CRP: " 
+			g_simpleTetris.drawTextToScreen(Position2(kWidth - 120, 20), L"POS: " 
 				+ std::to_wstring((int)g_simpleTetris.getCurrPos().x)
 				+ L","
 				+ std::to_wstring((int)g_simpleTetris.getCurrPos().y), Color(0,0,0));

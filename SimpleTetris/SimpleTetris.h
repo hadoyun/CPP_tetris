@@ -46,9 +46,9 @@ namespace fs
 		T,
 		O,
 		L,
-		IvL,
+		InvL,
 		Z,
-		IvZ,
+		InvZ,
 		MAX,
 	};
 
@@ -81,10 +81,15 @@ namespace fs
 
 		bool getRotablePosition(EDirection _eNextdir, fs::Position2& outPosition) const;
 
+		EBlockType getCurrentBlockType() const;
+
+		void setCurrentBlockType(EBlockType eBlockType);
+		
+
 	private:
 		void drawBlockUnitToImage(EBlockType _eBlockType, const Position2& position, const Color& color, uint8 alpha = 255);
 		
-		void drawToBlock(EBlockType _eBlockType, const Position2& position, EDirection _eDirect, bool bErase = false);
+		void drawBlockToBoard(EBlockType _eBlockType, const Position2& position, EDirection _eDirect, bool bErase = false);
 
 	private:
 		bool canDrawBlock(EBlockType _eBlockType, const Position2& position, EDirection _eDirect) const;
@@ -101,7 +106,7 @@ namespace fs
 
 		Position2				_currPos{};
 		EDirection				_currdir{ EDirection::N };
-		EBlockType				_curreBlockType{ EBlockType::T };
+		EBlockType				_currBlockType{ EBlockType::I };
 	private:
 		uint8					_aaBoard[(uint32)kBlockSize.y][(uint32)kBlockSize.x]{};
 		BlockContainer			_blocks[(int)fs::EBlockType::MAX][(int)EDirection::MAX]{};
