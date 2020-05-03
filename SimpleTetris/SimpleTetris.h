@@ -2,6 +2,7 @@
 
 #include "GraphicalWindow.h"
 #include <vector>
+#include <deque>
 
 namespace fs
 {
@@ -74,7 +75,7 @@ namespace fs
 
 	public:
 		void drawBoard(const Position2& position, const Color& borderColor, const Color& boardColor);
-		void move(EDirection _eDirection);
+		bool move(EDirection _eDirection);
 		void rotate();
 
 		const Position2& getCurrPos() const;
@@ -85,11 +86,16 @@ namespace fs
 
 		void setCurrentBlockType(EBlockType eBlockType);
 		
+	private:
+		EBlockType getNextBlockType() const;
+		
 
 	private:
 		void drawBlockUnitToImage(EBlockType _eBlockType, const Position2& position, const Color& color, uint8 alpha = 255);
 		
 		void drawBlockToBoard(EBlockType _eBlockType, const Position2& position, EDirection _eDirect, bool bErase = false);
+
+		void drawBlockToScreen(EBlockType _eBlockType, const Position2& position, EDirection _eDirect);
 
 	private:
 		bool canDrawBlock(EBlockType _eBlockType, const Position2& position, EDirection _eDirect) const;
@@ -100,14 +106,25 @@ namespace fs
 		bool tickTimer() const; 
 
 	public:
-		static constexpr Size2	kBlockSize{ 24, 24 }; // 블록 하나의 크기 
+		void updateNextBlockQueue();
+
+		uint32 getScore();
+
+		bool isGameOver() const;
+
+	private:
+		void checkBingo();
+
+	public:
+		static constexpr Size2	kBlockSize{ 30, 30 }; // 블록 하나의 크기 
 		static constexpr float	kBlockBorder{ 4 }; // 블록 하나의 둘레 
 		static constexpr Size2	kBoardSize{ 10, 20 }; // board의 크기 
 		static constexpr Size2	kBoardSizePixel{ kBlockSize * kBoardSize }; //보드의 전체 픽셀 지정
 		static constexpr int32	kBlockContainerSize{ 4 }; 
 
-
 		static constexpr int32	kTimerIntervalMin { 100 }; // 블록 하나의 둘레 
+		static constexpr int32  kNextBlockQueueMin{ 5 };
+		static constexpr int32  kNextBlockQueueMax{ 20 };
 	// ii == image index
 	private:
 		uint32					_iiBlocks[(uint32)EBlockType::MAX]{};
@@ -116,11 +133,19 @@ namespace fs
 		EDirection				_currdir{ EDirection::N };
 		EBlockType				_currBlockType{ EBlockType::I };
 	private:
+
 		uint8					_aaBoard[(uint32)kBlockSize.y][(uint32)kBlockSize.x]{};
 		BlockContainer			_blocks[(int)fs::EBlockType::MAX][(int)EDirection::MAX]{};
 
 	private:
 		int32					_timerInterval{ 1000 }; // 1000 ms == 1 s
 		mutable std::chrono::steady_clock::time_point _prevTime{};
+
+	private:
+		std::deque<EBlockType>	_nextBlockQueue{};
+	
+	private:
+		uint32					_score{};
+		bool					_isGameOver{ false };
 	};
 }
