@@ -9,7 +9,7 @@
 #pragma comment(lib, "Msimg32.lib")
 
 
-fs::IGraphicalWindow::IGraphicalWindow(int32 width, int32 height) : kWidth{ width }, kHeight{ height }
+fs::IGraphicalWindow::IGraphicalWindow(int32 width, int32 height) : g_kWidth{ width }, g_kHeight{ height }
 {
 	__noop;
 }
@@ -39,7 +39,7 @@ void fs::IGraphicalWindow::createInternal(const std::wstring& title, HINSTANCE h
 	// 윈도우를 생성한다
 	RECT windowRect{ 0, 0, 800, 600 };
 	_hWnd = CreateWindowExW(0, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED,
-		CW_USEDEFAULT, CW_USEDEFAULT, kWidth, kHeight,
+		CW_USEDEFAULT, CW_USEDEFAULT, g_kWidth, g_kHeight,
 		nullptr, nullptr, hInstance, nullptr);
 
 	// 윈도우를 보여준다.
@@ -170,8 +170,8 @@ void fs::IGraphicalWindow::beginRendering(const Color& clearColor)
 
 void fs::IGraphicalWindow::endRendering()
 {
-	// _backDc를 _frontDc로 복사 , 더블 버퍼링 ... !
-	BitBlt(_frontDc, 0, 0, kWidth, kHeight, _backDc, 0, 0, SRCCOPY);
+	// _backDc를 _frontDc로 복사
+	BitBlt(_frontDc, 0, 0, g_kWidth, g_kHeight, _backDc, 0, 0, SRCCOPY);
 
 	// 윈도우를 다시 그리도록 명령
 	UpdateWindow(_hWnd);
@@ -287,12 +287,28 @@ void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Posit
 		_tempDc, 0, 0, static_cast<int>(image.size.x), static_cast<int>(image.size.y), 0);
 }
 
+void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Position2& position, uint8 alpha)
+{
+	assert(imageIndex < static_cast<uint32>(_vImages.size()));
+	const auto& image{ _vImages[imageIndex] };
+	SelectObject(_tempDc, image.bitmap);
+
+	BLENDFUNCTION blend{};
+	blend.BlendOp = AC_SRC_OVER;
+	blend.BlendFlags = 0;
+	blend.AlphaFormat = 0;
+	blend.SourceConstantAlpha = alpha;
+	AlphaBlend(_backDc, static_cast<int>(position.x), static_cast<int>(position.y),
+		static_cast<int>(image.size.x), static_cast<int>(image.size.y),
+		_tempDc, 0, 0, static_cast<int>(image.size.x), static_cast<int>(image.size.y), blend);
+}
+
 void fs::IGraphicalWindow::drawImagePrecomputedAlphaToScreen(uint32 imageIndex, const Position2& position)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 	const auto& image{ _vImages[imageIndex] };
 	SelectObject(_tempDc, image.bitmap);
-	
+
 	BLENDFUNCTION blend{};
 	blend.BlendOp = AC_SRC_OVER;
 	blend.BlendFlags = 0;
@@ -327,6 +343,22 @@ void fs::IGraphicalWindow::drawTextToScreen(const Position2& position, const Siz
 	DrawTextW(_backDc, content.c_str(), static_cast<int>(content.size()), &rect, HorzAlign | VertAlign | DT_NOCLIP | DT_SINGLELINE);
 }
 
+//선은 HPEN을 사용해서 그려줘야한다.
+void fs::IGraphicalWindow::drawLineToScreen(const Position2& positionA, const Position2& positionB, const Color& color)
+{
+	//const HBRUSH brush{ CreateSolidBrush(RGB(color.r, color.g, color.b)) };
+	const HPEN Pen{ CreatePen(PS_SOLID, 1, RGB(color.r, color.g, color.b)) };
+	//const HBRUSH prevBrush{ (HBRUSH)SelectObject(_backDc, Pen) };
+	const HPEN prevPen{ (HPEN)SelectObject(_backDc, Pen) };
+
+	POINT point{};
+	MoveToEx(_backDc, (int32)positionA.x, (int32)positionA.y, &point);
+	LineTo(_backDc, (int32)positionB.x, (int32)positionB.y);
+
+	SelectObject(_backDc, prevPen);
+	DeleteObject(Pen);
+}
+
 fs::uint32 fs::IGraphicalWindow::getFps() const noexcept
 {
 	return _fps;
@@ -339,12 +371,12 @@ const std::wstring& fs::IGraphicalWindow::getFpsWstring() const noexcept
 
 fs::int32 fs::IGraphicalWindow::getWidth() const noexcept
 {
-	return kWidth;
+	return g_kWidth;
 }
 
 fs::int32 fs::IGraphicalWindow::getHeight() const noexcept
 {
-	return kHeight;
+	return g_kHeight;
 }
 
 bool fs::IGraphicalWindow::tickInput() const noexcept
@@ -386,7 +418,7 @@ void fs::IGraphicalWindow::initialize()
 	SetBkMode(_tempDc, TRANSPARENT);
 
 	// _backDc에서 사용할 비트맵을 생성하고, 설정한다.
-	_backDcBitmap = CreateCompatibleBitmap(_frontDc, kWidth, kHeight);
+	_backDcBitmap = CreateCompatibleBitmap(_frontDc, g_kWidth, g_kHeight);
 	SelectObject(_backDc, _backDcBitmap);
 }
 
@@ -403,8 +435,8 @@ void fs::IGraphicalWindow::uninitialize()
 	DeleteObject(_backDcBitmap);
 
 	// CreateCompatibleDC() <> DeleteDC()
-	DeleteDC(_tempDc);				
-	DeleteDC(_backDc);			
+	DeleteDC(_tempDc);
+	DeleteDC(_backDc);
 
 	// GetDC() <> ReleaseDC()
 	ReleaseDC(_hWnd, _frontDc);

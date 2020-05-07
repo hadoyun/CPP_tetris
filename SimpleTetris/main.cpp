@@ -1,17 +1,15 @@
 ﻿#include "SimpleTetris.h"
+//shift+f12 : 참조검색. 해당 함수 혹은 변수가 사용된 위치를 알려줌.
 
-static constexpr fs::int32 kWidth{ 700 };
-static constexpr fs::int32 kHeight{ 800 };
-//생성자를 통해 전역변수로 SimpleTetris 생성, 
-static fs::SimpleTetris g_simpleTetris{ kWidth, kHeight };
+static constexpr fs::int32 g_kWidth{ 600 };
+static constexpr fs::int32 g_kHeight{ 1000 };
+static fs::SimpleTetris g_simpleTetris{ g_kWidth, g_kHeight };
 
-//윈도우 프록시 생성
 LRESULT WINAPI WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	return g_simpleTetris.processWindowProc(hWnd, Msg, wParam, lParam);
 }
 
-//윈도우 메인 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	using namespace fs;
@@ -20,100 +18,100 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	g_simpleTetris.addFont(L"Consolas", 20, false);
 	g_simpleTetris.addFont(L"Jokerman", 46, false);
-	g_simpleTetris.addFont(L"HY견고딕", 30, true);
-	g_simpleTetris.addFont(L"HY견고딕", 100, true);
+	g_simpleTetris.addFont(L"휴먼매직체", 20, true);
+	g_simpleTetris.addFont(L"휴먼매직체", 80, true);
 
-	const Position2 boardPosition{ 10, 60 };
+	const Position2 boardPosition{ 10, 80 };
 	Color clearColor{ 240, 240, 255 };
 	Color fpsColor{ 0, 0, 100 };
+
+	g_simpleTetris.restartGame();
+
 	while (g_simpleTetris.update() == true)
 	{
-		g_simpleTetris.updateNextBlockQueue();
+		g_simpleTetris.updateNextblockQueue();
 
+		g_simpleTetris.updateGameLevel();
+
+		//gameover가 아닌 상황.
 		if (g_simpleTetris.isGameOver() == false)
 		{
 			if (g_simpleTetris.tickInput() == true)
 			{
-				if (GetAsyncKeyState(VK_LEFT) == (short)0x8001) // 0x8001 - 처음 한번 눌렀을 때만 확인함
-				{
-					g_simpleTetris.move(EDirection::W);
-				}
-				if (GetAsyncKeyState(VK_RIGHT) == (short)0x8001)
+				//0x8001: key가 처음 눌렸을 때를 의미함.
+				if (GetAsyncKeyState(VK_LEFT) == SHORT(0x8001))
 				{
 					g_simpleTetris.move(EDirection::E);
 				}
-				if (GetAsyncKeyState(VK_UP) == (short)0x8001)
+				if (GetAsyncKeyState(VK_RIGHT) == SHORT(0x8001))
+				{
+					g_simpleTetris.move(EDirection::W);
+				}
+				if (GetAsyncKeyState(VK_UP) == SHORT(0x8001))
 				{
 					//g_simpleTetris.move(EDirection::N);
 					g_simpleTetris.rotate();
 				}
-				if (GetAsyncKeyState(VK_DOWN) == (short)0x8001)
+				if (GetAsyncKeyState(VK_DOWN) == SHORT(0x8001))
 				{
 					g_simpleTetris.move(EDirection::S);
 				}
-				if (GetAsyncKeyState(VK_SPACE) == (short)0x8001)
+				if (GetAsyncKeyState(VK_SPACE) == SHORT(0x8001))
 				{
 					while (g_simpleTetris.move(EDirection::S) == true)
 					{
-						__noop;
+
 					}
 					//g_simpleTetris.rotate();
 				}
-				if (GetAsyncKeyState('Q') == (short)0x8001)
+				if (GetAsyncKeyState('Q') == SHORT(0x8001))
 				{
-					auto currBlockType = g_simpleTetris.getCurrentBlockType();
-
-					uint32 iNextBlockType = (uint32)currBlockType + 1;
-
+					auto currBlockType = g_simpleTetris.getCurrBlockType();
+					uint32 iNextBlockType{ (uint32)currBlockType + 1 };
 					if (iNextBlockType >= (uint32)EBlockType::MAX)
 					{
 						iNextBlockType = 2;
 					}
-
-					g_simpleTetris.setCurrentBlockType((EBlockType)iNextBlockType);
+					g_simpleTetris.setCurrBlockType((EBlockType)iNextBlockType);
 				}
-				if (GetAsyncKeyState('W') == (short)0x8001)
+#if defined DEBUG || _DEBUG
+				if (GetAsyncKeyState('W') == SHORT(0x8001))
 				{
-					auto timerInterval = g_simpleTetris.getTimerInterval();
+					auto timerInterval{ g_simpleTetris.getTimerInterval() };
 
 					g_simpleTetris.setTimerInterval(timerInterval - 50);
 				}
-				if (g_simpleTetris.tickTimer() == true)
+#endif 
+				if (g_simpleTetris.tickGameSpeedTimer() == true)
 				{
 					g_simpleTetris.move(EDirection::S);
 				}
 			}
 		}
-		
+
 
 		g_simpleTetris.beginRendering(clearColor);
 		{
 			g_simpleTetris.drawBoard(boardPosition, Color(0, 60, 100), Color(200, 200, 200));
-			
-			g_simpleTetris.drawBoard(boardPosition, Color(0, 60, 100), Color(200, 200, 200));
 
-			//g_simpleTetris.drawImageAlphaToScreen(1, position); // L자 블록을 그리는 함수
-
-			g_simpleTetris.useFont(1); // 폰트 사용
+			g_simpleTetris.useFont(1);
 			g_simpleTetris.drawTextToScreen(Position2(0, 0), Size2(SimpleTetris::kBoardSizePixel.x + 20, boardPosition.y - 10), L"TETRIS", Color(200, 100, 100),
-				EHorzAlign::Center, EVertAlign::Center); // 텍스트 그리기 
+				EHorzAlign::Center, EVertAlign::Center);
 
-			g_simpleTetris.useFont(2); 
-			/*g_simpleTetris.drawTextToScreen(Position2(kWidth - 110, 0), L"FPS: " + g_simpleTetris.getFpsWstring(), fpsColor);
-			
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 110, 20), L"POS: " 
-				+ std::to_wstring((int)g_simpleTetris.getCurrPos().x)
-				+ L","
-				+ std::to_wstring((int)g_simpleTetris.getCurrPos().y), Color(0,0,0));*/
-
-			g_simpleTetris.drawTextToScreen(Position2(kWidth - 230, 620), L"점수: "
-				+ std::to_wstring(g_simpleTetris.getScore()), Color(0, 0, 0));
+			g_simpleTetris.useFont(2);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 25), L"SCORE: " + std::to_wstring(g_simpleTetris.getCurrScore()), fpsColor);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 45), L"LEVEL: " + std::to_wstring(g_simpleTetris.getCurrLevel()), fpsColor);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 65), L"EXP: " + std::to_wstring(g_simpleTetris.getCurrLevelScore()), fpsColor);
 
 			if (g_simpleTetris.isGameOver() == true)
 			{
-				g_simpleTetris.useFont(3); // 폰트 사용
-				g_simpleTetris.drawTextToScreen(Position2(0, 0), Size2(kWidth, 300), L"GameOver", Color(200, 100, 100),
-					EHorzAlign::Center, EVertAlign::Center); // 텍스트 그리기 
+				g_simpleTetris.useFont(3);
+				g_simpleTetris.drawTextToScreen(Position2(0, 0), Size2(g_kWidth, g_kHeight), L"GAME OVER"
+					, fpsColor, EHorzAlign::Center, EVertAlign::Center);
+				if (GetAsyncKeyState('R') == SHORT(0x8001))
+				{
+					g_simpleTetris.restartGame();
+				}
 			}
 		}
 		g_simpleTetris.endRendering();

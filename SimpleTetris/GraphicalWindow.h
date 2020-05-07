@@ -56,7 +56,7 @@ namespace fs
 	};
 	using Position2 = Float2;
 	using Size2 = Float2;
-	
+
 
 	struct Color
 	{
@@ -189,10 +189,14 @@ namespace fs
 
 		void drawImageToScreen(uint32 imageIndex, const Position2& position);
 		void drawImageAlphaToScreen(uint32 imageIndex, const Position2& position);
+		void drawImageAlphaToScreen(uint32 imageIndex, const Position2& position, uint8 alpha);
 		void drawImagePrecomputedAlphaToScreen(uint32 imageIndex, const Position2& position);
 		void drawTextToScreen(const Position2& position, const std::wstring& content, const Color& color);
 		void drawTextToScreen(const Position2& position, const Size2& area, const std::wstring& content, const Color& color,
 			EHorzAlign eHorzAlign, EVertAlign eVertAlign);
+		void drawLineToScreen(const Position2& positionA, const Position2& positionB, const Color& color);
+
+		void gideBocks();
 
 	public:
 		uint32 getFps() const noexcept;
@@ -202,14 +206,16 @@ namespace fs
 		bool tickInput() const noexcept;
 		bool tickSecond() const noexcept;
 
+
+
 	private:
 		void initialize();
 		void uninitialize();
 
 	protected:
 		static constexpr uint32	kFpsBufferSize{ 20 };
-		const int32				kWidth{ 800 };
-		const int32				kHeight{ 600 };
+		const int32				g_kWidth{ 800 };
+		const int32				g_kHeight{ 600 };
 
 	private:
 		HWND					_hWnd{};
