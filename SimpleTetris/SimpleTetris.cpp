@@ -14,18 +14,20 @@ fs::SimpleTetris::~SimpleTetris()
 
 void fs::SimpleTetris::create(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
-	createInternal(title, hInstance, windowProc);
+	{
+		createInternal(title, hInstance, windowProc);
 
-	srand(std::chrono::steady_clock::now().time_since_epoch().count());
+		srand(std::chrono::steady_clock::now().time_since_epoch().count());
 
-	createBlock(EBlockType::Used, Color(100, 100, 100));
-	createBlock(EBlockType::I, Color(255, 60, 60));
-	createBlock(EBlockType::T, Color(160, 80, 200));
-	createBlock(EBlockType::O, Color(255, 255, 0));
-	createBlock(EBlockType::L, Color(255, 200, 0));
-	createBlock(EBlockType::InvL, Color(0, 180, 255));
-	createBlock(EBlockType::Z, Color(40, 255, 40));
-	createBlock(EBlockType::S, Color(255, 127, 255));
+		createBlock(EBlockType::Used, Color(100, 100, 100));
+		createBlock(EBlockType::I, Color(255, 60, 60));
+		createBlock(EBlockType::T, Color(160, 80, 200));
+		createBlock(EBlockType::O, Color(255, 255, 0));
+		createBlock(EBlockType::L, Color(255, 200, 0));
+		createBlock(EBlockType::InvL, Color(0, 180, 255));
+		createBlock(EBlockType::Z, Color(40, 255, 40));
+		createBlock(EBlockType::S, Color(255, 127, 255));
+	}
 
 	{
 		// I형 블록
@@ -247,8 +249,10 @@ void fs::SimpleTetris::create(const std::wstring& title, HINSTANCE hInstance, WN
 	}
 	updateNextblockQueue();
 
-	/*_board[10][4] = 1;
-	_board[6][0] = 1;*/
+	for (int i = 0; i < kBoardSize.x - 1; ++i)
+	{
+		_board[4][i] = 1;
+	}
 }
 
 void fs::SimpleTetris::guideBlock(Position2 boardOffset)
@@ -282,7 +286,7 @@ void fs::SimpleTetris::guideBlock(Position2 boardOffset)
 			break;
 		}
 	}
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, false);
+	//drawBlockToBoard(_currBlockType, _currPosition, _currDirection, false);
 }
 
 void fs::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& borderColor, const Color& boardColor)
