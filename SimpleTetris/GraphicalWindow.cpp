@@ -9,17 +9,17 @@
 #pragma comment(lib, "Msimg32.lib")
 
 
-fs::IGraphicalWindow::IGraphicalWindow(int32 width, int32 height) : g_kWidth{ width }, g_kHeight{ height }
+hady::IGraphicalWindow::IGraphicalWindow(int32 width, int32 height) : g_kWidth{ width }, g_kHeight{ height }
 {
 	__noop;
 }
 
-fs::IGraphicalWindow::~IGraphicalWindow()
+hady::IGraphicalWindow::~IGraphicalWindow()
 {
 	uninitialize();
 }
 
-void fs::IGraphicalWindow::createInternal(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
+void hady::IGraphicalWindow::createInternal(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
 	// 윈도우 클래스를 등록한다
 	WNDCLASSEXW windowClass{};
@@ -49,7 +49,7 @@ void fs::IGraphicalWindow::createInternal(const std::wstring& title, HINSTANCE h
 	initialize();
 }
 
-LRESULT fs::IGraphicalWindow::processWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT hady::IGraphicalWindow::processWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (Msg)
 	{
@@ -68,18 +68,18 @@ LRESULT fs::IGraphicalWindow::processWindowProc(HWND hWnd, UINT Msg, WPARAM wPar
 	return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
-void fs::IGraphicalWindow::addFont(const std::wstring& fontName, int32 size, bool isKorean)
+void hady::IGraphicalWindow::addFont(const std::wstring& fontName, int32 size, bool isKorean)
 {
 	_vFonts.emplace_back(CreateFont(size, 0, 0, 0, 0, FALSE, FALSE, FALSE, (isKorean == true) ? HANGEUL_CHARSET : 0, 0, 0, 0, 0, fontName.c_str()));
 }
 
-void fs::IGraphicalWindow::useFont(uint32 fontIndex)
+void hady::IGraphicalWindow::useFont(uint32 fontIndex)
 {
 	assert(fontIndex < static_cast<uint32>(_vFonts.size()));
 	SelectObject(_backDc, _vFonts[fontIndex]);
 }
 
-fs::uint32 fs::IGraphicalWindow::createImageFromFile(const std::wstring& fileName)
+hady::uint32 hady::IGraphicalWindow::createImageFromFile(const std::wstring& fileName)
 {
 	char fileNameA[MAX_PATH]{};
 	WideCharToMultiByte(CP_ACP, 0, fileName.c_str(), static_cast<int>(fileName.size()), fileNameA, MAX_PATH, 0, FALSE);
@@ -95,7 +95,7 @@ fs::uint32 fs::IGraphicalWindow::createImageFromFile(const std::wstring& fileNam
 	return static_cast<uint32>(_vImages.size() - 1);
 }
 
-fs::uint32 fs::IGraphicalWindow::createBlankImage(const Size2& size)
+hady::uint32 hady::IGraphicalWindow::createBlankImage(const Size2& size)
 {
 	HBITMAP bitmap{ CreateCompatibleBitmap(_backDc, static_cast<int>(size.x), static_cast<int>(size.y)) };
 	_vImages.emplace_back(bitmap, size);
@@ -103,7 +103,7 @@ fs::uint32 fs::IGraphicalWindow::createBlankImage(const Size2& size)
 	return static_cast<uint32>(_vImages.size() - 1);
 }
 
-bool fs::IGraphicalWindow::update()
+bool hady::IGraphicalWindow::update()
 {
 	MSG msg{};
 	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) == TRUE)
@@ -156,7 +156,7 @@ bool fs::IGraphicalWindow::update()
 	return true;
 }
 
-void fs::IGraphicalWindow::beginRendering(const Color& clearColor)
+void hady::IGraphicalWindow::beginRendering(const Color& clearColor)
 {
 	// 윈도우의 상하좌우를 얻어온다.
 	RECT windowRect{};
@@ -168,7 +168,7 @@ void fs::IGraphicalWindow::beginRendering(const Color& clearColor)
 	DeleteObject(brush);
 }
 
-void fs::IGraphicalWindow::endRendering()
+void hady::IGraphicalWindow::endRendering()
 {
 	// _backDc를 _frontDc로 복사
 	BitBlt(_frontDc, 0, 0, g_kWidth, g_kHeight, _backDc, 0, 0, SRCCOPY);
@@ -177,7 +177,7 @@ void fs::IGraphicalWindow::endRendering()
 	UpdateWindow(_hWnd);
 }
 
-void fs::IGraphicalWindow::drawRectangleToScreen(const Position2& position, const Size2& size, const Color& color, uint8 alpha)
+void hady::IGraphicalWindow::drawRectangleToScreen(const Position2& position, const Size2& size, const Color& color, uint8 alpha)
 {
 	const LONG width{ static_cast<LONG>(size.x) };
 	const LONG height{ static_cast<LONG>(size.y) };
@@ -218,7 +218,7 @@ void fs::IGraphicalWindow::drawRectangleToScreen(const Position2& position, cons
 	DeleteObject(brush);
 }
 
-void fs::IGraphicalWindow::drawRectangleToImage(uint32 imageIndex, const Position2& position, const Size2& size, const Color& color, uint8 alpha)
+void hady::IGraphicalWindow::drawRectangleToImage(uint32 imageIndex, const Position2& position, const Size2& size, const Color& color, uint8 alpha)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 
@@ -265,7 +265,7 @@ void fs::IGraphicalWindow::drawRectangleToImage(uint32 imageIndex, const Positio
 	DeleteObject(brush);
 }
 
-void fs::IGraphicalWindow::drawImageToScreen(uint32 imageIndex, const Position2& position)
+void hady::IGraphicalWindow::drawImageToScreen(uint32 imageIndex, const Position2& position)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 	const auto& image{ _vImages[imageIndex] };
@@ -276,7 +276,7 @@ void fs::IGraphicalWindow::drawImageToScreen(uint32 imageIndex, const Position2&
 		_tempDc, 0, 0, SRCCOPY);
 }
 
-void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Position2& position)
+void hady::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Position2& position)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 	const auto& image{ _vImages[imageIndex] };
@@ -287,7 +287,7 @@ void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Posit
 		_tempDc, 0, 0, static_cast<int>(image.size.x), static_cast<int>(image.size.y), 0);
 }
 
-void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Position2& position, uint8 alpha)
+void hady::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Position2& position, uint8 alpha)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 	const auto& image{ _vImages[imageIndex] };
@@ -303,7 +303,7 @@ void fs::IGraphicalWindow::drawImageAlphaToScreen(uint32 imageIndex, const Posit
 		_tempDc, 0, 0, static_cast<int>(image.size.x), static_cast<int>(image.size.y), blend);
 }
 
-void fs::IGraphicalWindow::drawImagePrecomputedAlphaToScreen(uint32 imageIndex, const Position2& position)
+void hady::IGraphicalWindow::drawImagePrecomputedAlphaToScreen(uint32 imageIndex, const Position2& position)
 {
 	assert(imageIndex < static_cast<uint32>(_vImages.size()));
 	const auto& image{ _vImages[imageIndex] };
@@ -319,7 +319,7 @@ void fs::IGraphicalWindow::drawImagePrecomputedAlphaToScreen(uint32 imageIndex, 
 		_tempDc, 0, 0, static_cast<int>(image.size.x), static_cast<int>(image.size.y), blend);
 }
 
-void fs::IGraphicalWindow::drawTextToScreen(const Position2& position, const std::wstring& content, const Color& color)
+void hady::IGraphicalWindow::drawTextToScreen(const Position2& position, const std::wstring& content, const Color& color)
 {
 	RECT rect{};
 	rect.left = static_cast<LONG>(position.x);
@@ -328,7 +328,7 @@ void fs::IGraphicalWindow::drawTextToScreen(const Position2& position, const std
 	DrawTextW(_backDc, content.c_str(), static_cast<int>(content.size()), &rect, DT_LEFT | DT_TOP | DT_NOCLIP | DT_SINGLELINE);
 }
 
-void fs::IGraphicalWindow::drawTextToScreen(const Position2& position, const Size2& area, const std::wstring& content, const Color& color,
+void hady::IGraphicalWindow::drawTextToScreen(const Position2& position, const Size2& area, const std::wstring& content, const Color& color,
 	EHorzAlign eHorzAlign, EVertAlign eVertAlign)
 {
 	UINT HorzAlign{ static_cast<UINT>((eHorzAlign == EHorzAlign::Left) ? DT_LEFT : (eHorzAlign == EHorzAlign::Center) ? DT_CENTER : DT_RIGHT) };
@@ -344,7 +344,7 @@ void fs::IGraphicalWindow::drawTextToScreen(const Position2& position, const Siz
 }
 
 //선은 HPEN을 사용해서 그려줘야한다.
-void fs::IGraphicalWindow::drawLineToScreen(const Position2& positionA, const Position2& positionB, const Color& color)
+void hady::IGraphicalWindow::drawLineToScreen(const Position2& positionA, const Position2& positionB, const Color& color)
 {
 	//const HBRUSH brush{ CreateSolidBrush(RGB(color.r, color.g, color.b)) };
 	const HPEN Pen{ CreatePen(PS_SOLID, 1, RGB(color.r, color.g, color.b)) };
@@ -359,27 +359,27 @@ void fs::IGraphicalWindow::drawLineToScreen(const Position2& positionA, const Po
 	DeleteObject(Pen);
 }
 
-fs::uint32 fs::IGraphicalWindow::getFps() const noexcept
+hady::uint32 hady::IGraphicalWindow::getFps() const noexcept
 {
 	return _fps;
 }
 
-const std::wstring& fs::IGraphicalWindow::getFpsWstring() const noexcept
+const std::wstring& hady::IGraphicalWindow::getFpsWstring() const noexcept
 {
 	return _fpsWstring;
 }
 
-fs::int32 fs::IGraphicalWindow::getWidth() const noexcept
+hady::int32 hady::IGraphicalWindow::getWidth() const noexcept
 {
 	return g_kWidth;
 }
 
-fs::int32 fs::IGraphicalWindow::getHeight() const noexcept
+hady::int32 hady::IGraphicalWindow::getHeight() const noexcept
 {
 	return g_kHeight;
 }
 
-bool fs::IGraphicalWindow::tickInput() const noexcept
+bool hady::IGraphicalWindow::tickInput() const noexcept
 {
 	if (_bInputTick == true)
 	{
@@ -389,7 +389,7 @@ bool fs::IGraphicalWindow::tickInput() const noexcept
 	return false;
 }
 
-bool fs::IGraphicalWindow::tickSecond() const noexcept
+bool hady::IGraphicalWindow::tickSecond() const noexcept
 {
 	if (_bSecondTick == true)
 	{
@@ -399,7 +399,7 @@ bool fs::IGraphicalWindow::tickSecond() const noexcept
 	return false;
 }
 
-void fs::IGraphicalWindow::initialize()
+void hady::IGraphicalWindow::initialize()
 {
 	// 현재 윈도우의 기본 Device Context를 얻어온다.
 	_frontDc = GetDC(_hWnd);
@@ -422,7 +422,7 @@ void fs::IGraphicalWindow::initialize()
 	SelectObject(_backDc, _backDcBitmap);
 }
 
-void fs::IGraphicalWindow::uninitialize()
+void hady::IGraphicalWindow::uninitialize()
 {
 	for (auto& image : _vImages)
 	{

@@ -24,6 +24,9 @@
     <ClCompile Include="GraphicalWindow.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="CheapTimer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SimpleTetris.h">
@@ -33,6 +36,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CheapTimer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

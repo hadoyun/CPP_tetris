@@ -5,19 +5,13 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include "Common.h"
 
-
-namespace fs
+namespace hady
 {
-	using int8 = int8_t;
-	using int32 = int32_t;
-	using uint8 = uint8_t;
-	using uint32 = uint32_t;
-
 	using steadyClock = std::chrono::steady_clock;
 	using timePoint = steadyClock::time_point;
 	using miliSec = std::chrono::milliseconds;
-
 
 	struct Float2
 	{
@@ -64,13 +58,13 @@ namespace fs
 		{
 			__noop;
 		}
-		constexpr Color(uint8 r_, uint8 g_, uint8 b_) : r{ r_ }, g{ g_ }, b{ b_ }
+		constexpr Color(float r_, float g_, float b_) : r{ r_ }, g{ g_ }, b{ b_ }
 		{
 			__noop;
 		}
-		uint8 r{};
-		uint8 g{};
-		uint8 b{};
+		float r{};
+		float g{};
+		float b{};
 
 		constexpr void add(const Color& o)
 		{
@@ -157,7 +151,7 @@ namespace fs
 		virtual ~IGraphicalWindow();
 
 	public:
-		virtual void create(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) abstract;
+		virtual void set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) abstract;
 
 	protected:
 		// create() 안에서 이 함수를 반드시 가장 먼저 호출하세요.

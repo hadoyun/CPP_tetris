@@ -2,17 +2,17 @@
 #include <thread>
 
 
-fs::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
+hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
 {
 	__noop;
 }
 
-fs::SimpleTetris::~SimpleTetris()
+hady::SimpleTetris::~SimpleTetris()
 {
 	__noop;
 }
 
-void fs::SimpleTetris::create(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
+void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
 	{
 		createInternal(title, hInstance, windowProc);
@@ -248,14 +248,9 @@ void fs::SimpleTetris::create(const std::wstring& title, HINSTANCE hInstance, WN
 		}
 	}
 	updateNextblockQueue();
-
-	for (int i = 0; i < kBoardSize.x - 1; ++i)
-	{
-		_board[4][i] = 1;
-	}
 }
 
-void fs::SimpleTetris::guideBlock(Position2 boardOffset)
+void hady::SimpleTetris::drawGuideBlock(Position2 boardOffset)
 {
 	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 	bool shouldDraw{ false };
@@ -289,7 +284,7 @@ void fs::SimpleTetris::guideBlock(Position2 boardOffset)
 	//drawBlockToBoard(_currBlockType, _currPosition, _currDirection, false);
 }
 
-void fs::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& borderColor, const Color& boardColor)
+void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& borderColor, const Color& boardColor)
 {
 	// 판 테두리
 	drawRectangleToScreen(boardOffset - Position2(10, 10), kBoardSizePixel + Size2(20, 20), borderColor);
@@ -324,10 +319,10 @@ void fs::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bord
 		}
 	}
 
-	guideBlock(boardOffset);
+	drawGuideBlock(boardOffset);
 }
 
-void fs::SimpleTetris::drawGrid(const fs::Position2& startPosition)
+void hady::SimpleTetris::drawGrid(const hady::Position2& startPosition)
 {
 	for (int y = 0; y < (int)kBoardSize.y; ++y)
 	{
@@ -342,13 +337,13 @@ void fs::SimpleTetris::drawGrid(const fs::Position2& startPosition)
 	}
 }
 
-bool fs::SimpleTetris::move(EDirection eDirection)
+bool hady::SimpleTetris::move(EDirection eDirection)
 {
 	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	switch (eDirection)
 	{
-	case fs::EDirection::N:
+	case hady::EDirection::N:
 		if (canDrawBlock(_currBlockType, _currPosition - Position2(0, 1), _currDirection) == true)
 		{
 			_currPosition.y -= 1;
@@ -356,7 +351,7 @@ bool fs::SimpleTetris::move(EDirection eDirection)
 			return true;
 		}
 		break;
-	case fs::EDirection::W:
+	case hady::EDirection::W:
 		if (canDrawBlock(_currBlockType, _currPosition + Position2(1, 0), _currDirection) == true)
 		{
 			_currPosition.x += 1;
@@ -364,7 +359,7 @@ bool fs::SimpleTetris::move(EDirection eDirection)
 			return true;
 		}
 		break;
-	case fs::EDirection::S:
+	case hady::EDirection::S:
 		if (canDrawBlock(_currBlockType, _currPosition + Position2(0, 1), _currDirection) == true)
 		{
 			_currPosition.y += 1;
@@ -389,7 +384,7 @@ bool fs::SimpleTetris::move(EDirection eDirection)
 			checkBingo();
 		}
 		break;
-	case fs::EDirection::E:
+	case hady::EDirection::E:
 		if (canDrawBlock(_currBlockType, _currPosition - Position2(1, 0), _currDirection) == true)
 		{
 			_currPosition.x -= 1;
@@ -400,11 +395,10 @@ bool fs::SimpleTetris::move(EDirection eDirection)
 	default:
 		break;
 	}
-
 	return false;
 }
 
-void fs::SimpleTetris::rotate()
+void hady::SimpleTetris::rotate()
 {
 	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
@@ -436,7 +430,7 @@ void fs::SimpleTetris::rotate()
 	}
 }
 
-const bool fs::SimpleTetris::getRotatablePosition(EDirection eNextDirection, fs::Position2& outPosition) const
+const bool hady::SimpleTetris::getRotatablePosition(EDirection eNextDirection, hady::Position2& outPosition) const
 {
 	outPosition = _currPosition;
 	bool shouldPush{ false };
@@ -477,12 +471,12 @@ const bool fs::SimpleTetris::getRotatablePosition(EDirection eNextDirection, fs:
 	return shouldPush;
 }
 
-const fs::Position2& fs::SimpleTetris::getCurrPosition() const
+const hady::Position2& hady::SimpleTetris::getCurrPosition() const
 {
 	return _currPosition;
 }
 
-void fs::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
+void hady::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
 {
 	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
@@ -496,19 +490,19 @@ void fs::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
 	}
 }
 
-fs::EBlockType fs::SimpleTetris::getCurrBlockType() const
+hady::EBlockType hady::SimpleTetris::getCurrBlockType() const
 {
 	return _currBlockType;
 }
 
-fs::EBlockType fs::SimpleTetris::getRandomBlockType() const
+hady::EBlockType hady::SimpleTetris::getRandomBlockType() const
 {
 	int32 iBlockType{ (int32)(((double)rand() / (double)(RAND_MAX + 1)) * 7.0) + 2 };
 
 	return (EBlockType)iBlockType;
 }
 
-void fs::SimpleTetris::updateNextblockQueue()
+void hady::SimpleTetris::updateNextblockQueue()
 {
 	while (_nextBlockQueue.size() < kNextBlockQueueMinSize)
 	{
@@ -523,7 +517,7 @@ void fs::SimpleTetris::updateNextblockQueue()
 	}
 }
 
-void fs::SimpleTetris::setTimerInterval(int32 interval)
+void hady::SimpleTetris::setTimerInterval(int32 interval)
 {
 	if (interval <= kTimerIntervalMin)
 	{
@@ -533,12 +527,12 @@ void fs::SimpleTetris::setTimerInterval(int32 interval)
 	_gameSpeed = interval;
 }
 
-fs::int32 fs::SimpleTetris::getTimerInterval() const
+hady::int32 hady::SimpleTetris::getTimerInterval() const
 {
 	return _gameSpeed;
 }
 
-bool fs::SimpleTetris::tickGameSpeedTimer() const
+bool hady::SimpleTetris::tickGameSpeedTimer() const
 {
 	using namespace std::chrono;
 
@@ -554,7 +548,7 @@ bool fs::SimpleTetris::tickGameSpeedTimer() const
 	return false;
 }
 
-void fs::SimpleTetris::updateGameLevel()
+void hady::SimpleTetris::updateGameLevel()
 {
 	if (_currLevelScore >= _scoreForNextLevel && _currLevel < 100)
 	{
@@ -566,30 +560,31 @@ void fs::SimpleTetris::updateGameLevel()
 		{
 			_gameSpeed -= 40;
 		}
+		_isLevelup = true;
 	}
 }
 
-fs::uint32 fs::SimpleTetris::getCurrScore() const
+hady::uint32 hady::SimpleTetris::getCurrScore() const
 {
 	return _currScore;
 }
 
-fs::uint32 fs::SimpleTetris::getCurrLevel() const
+hady::uint32 hady::SimpleTetris::getCurrLevel() const
 {
 	return _currLevel;
 }
 
-fs::uint32 fs::SimpleTetris::getCurrLevelScore() const
+hady::uint32 hady::SimpleTetris::getCurrLevelScore() const
 {
 	return _currLevelScore;
 }
 
-bool fs::SimpleTetris::isGameOver() const
+bool hady::SimpleTetris::isGameOver() const
 {
 	return _isGameOver;
 }
 
-void fs::SimpleTetris::restartGame()
+void hady::SimpleTetris::restartGame()
 {
 	_isGameOver = false;
 
@@ -616,19 +611,21 @@ void fs::SimpleTetris::restartGame()
 	_nextBlockQueue.pop_front();
 
 	_currScore = 0;
+	_bingoCount = 0;
 }
 
-fs::Position2 fs::SimpleTetris::getInitialBlockPosition() const
+hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 {
 	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), -(kBlockContainerSize * 0.5) };
 
 	return result;
 }
 
-void fs::SimpleTetris::checkBingo()
+void hady::SimpleTetris::checkBingo()
 {
 	int32 currY{ (int32)kBoardSize.y - 1 };
-	uint32 bingoCount{};
+	
+
 
 	while (currY >= 0)
 	{
@@ -653,7 +650,7 @@ void fs::SimpleTetris::checkBingo()
 				memcpy(_board[y + 1], _board[y], (size_t)kBoardSize.x);
 			}
 
-			++bingoCount;
+			++_bingoCount;
 		}
 		else
 		{
@@ -661,19 +658,20 @@ void fs::SimpleTetris::checkBingo()
 		}
 	}
 
-	uint32 deltaScore{ (bingoCount * bingoCount) * 100 };
+	uint32 deltaScore{ (_bingoCount * _bingoCount) * 100 };
 
 	_currScore += deltaScore;
 	_currLevelScore += deltaScore;
+	_comboCount = 0;
 }
 
-void fs::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
+void hady::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
 {
 	_iiBlocks[(uint32)eBlockType] = createBlankImage(kBlockSize);
 	drawBlockUnitToImage(eBlockType, Position2(0, 0), color, alpha);
 }
 
-void fs::SimpleTetris::drawBlockUnitToImage(EBlockType eBlockType, const Position2& position, const Color& color, uint8 alpha)
+void hady::SimpleTetris::drawBlockUnitToImage(EBlockType eBlockType, const Position2& position, const Color& color, uint8 alpha)
 {
 	const auto imageIndex{ _iiBlocks[(uint32)eBlockType] };
 	drawRectangleToImage(imageIndex, position, kBlockSize, color, alpha);
@@ -690,7 +688,7 @@ void fs::SimpleTetris::drawBlockUnitToImage(EBlockType eBlockType, const Positio
 		Size2(kBlockBorder, kBlockSize.y - 1), Color::add(color, Color(60, 60, 60)), alpha);
 }
 
-void fs::SimpleTetris::drawBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase)
+void hady::SimpleTetris::drawBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase)
 {
 	const int32 x{ int32(position.x) };
 	const int32 y{ int32(position.y) };
@@ -711,7 +709,7 @@ void fs::SimpleTetris::drawBlockToBoard(EBlockType eBlockType, const Position2& 
 	}
 }
 
-void fs::SimpleTetris::drawBlockToScreen(EBlockType eBlockType, const Position2& position, EDirection eDirection)
+void hady::SimpleTetris::drawBlockToScreen(EBlockType eBlockType, const Position2& position, EDirection eDirection)
 {
 	int32 blockType{ (int32)eBlockType };
 	const auto& block{ _blocks[blockType][(uint32)eDirection] };
@@ -728,7 +726,7 @@ void fs::SimpleTetris::drawBlockToScreen(EBlockType eBlockType, const Position2&
 	}
 }
 
-bool fs::SimpleTetris::canDrawBlock(EBlockType eBlockType, const Position2& position, EDirection eDirection) const
+bool hady::SimpleTetris::canDrawBlock(EBlockType eBlockType, const Position2& position, EDirection eDirection) const
 {
 	const int32 x{ int32(position.x) };
 	const int32 y{ int32(position.y) };
@@ -758,4 +756,34 @@ bool fs::SimpleTetris::canDrawBlock(EBlockType eBlockType, const Position2& posi
 		}
 	}
 	return true;
+}
+
+void hady::SimpleTetris::togglePause() const
+{
+	_pause = !_pause;
+}
+
+bool hady::SimpleTetris::getPause() const
+{
+	return _pause;
+}
+
+hady::uint32 hady::SimpleTetris::getBingoCount() const
+{
+	return _bingoCount;
+}
+
+void hady::SimpleTetris::addComboCount()
+{
+	++_bingoCount;
+}
+
+bool hady::SimpleTetris::getGameLevelUp() const
+{
+	return _isLevelup;
+}
+
+void hady::SimpleTetris::resetGameLevelUp()
+{
+	_isLevelup = false;
 }

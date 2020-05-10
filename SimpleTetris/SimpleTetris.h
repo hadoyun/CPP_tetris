@@ -4,7 +4,7 @@
 //#include <queue>
 #include <deque>
 
-namespace fs
+namespace hady
 {
 	struct BlockContainer
 	{
@@ -67,9 +67,9 @@ namespace fs
 		~SimpleTetris();
 
 	public:
-		virtual void create(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) override;
+		virtual void set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) override;
 
-		void guideBlock(Position2 boardOffset);
+		void drawGuideBlock(Position2 boardOffset);
 
 	public:
 		void drawBoard(const Position2& boardOffset, const Color& borderColor, const Color& boardColor);
@@ -80,7 +80,7 @@ namespace fs
 		void rotate();
 
 	private:
-		const bool getRotatablePosition(EDirection eNextDirection, fs::Position2& outPosition) const;
+		const bool getRotatablePosition(EDirection eNextDirection, hady::Position2& outPosition) const;
 
 	public:
 		const Position2& getCurrPosition() const;
@@ -132,6 +132,17 @@ namespace fs
 		bool canDrawBlock(EBlockType eBlockType, const Position2& position, EDirection eDirection) const;
 
 	public:
+		void togglePause() const;
+
+		bool getPause() const;
+
+	public:
+		uint32 getBingoCount() const;
+		void addComboCount();
+		bool getGameLevelUp() const;
+		void resetGameLevelUp();
+
+	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
 		static constexpr float	kBlockBorder{ 2 };
 		static constexpr Size2	kBoardSize{ 10, 20 };
@@ -155,7 +166,7 @@ namespace fs
 	private:
 		// 밀리초 = ms
 		// 마이크로초 = us (그리스어 뮤랑 제일 닮아서)
-		int32					_gameSpeed{ 1010 };
+		int32					_gameSpeed{ 2000 };
 		mutable std::chrono::steady_clock::time_point _prevTime{};
 
 	private:
@@ -177,5 +188,13 @@ namespace fs
 		bool _isGameOver{ false };
 
 		uint8 _blockspwansCounts[uint32(EBlockType::MAX)][uint32(EBlockType::MAX)]{};
+
+		mutable bool			_pause{ false };
+
+	private:
+		bool					_isBingo{ false };
+		uint32					_bingoCount{};
+		uint32					_comboCount{};
+		mutable bool			_isLevelup{ false };
 	};
 }
