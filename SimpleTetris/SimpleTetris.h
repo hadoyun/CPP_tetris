@@ -118,9 +118,6 @@ namespace hady
 		Position2 getInitialBlockPosition() const;
 
 	private:
-		void checkBingo();
-
-	private:
 		void createBlock(EBlockType eBlockType, const Color& color, uint8 alpha = 255);
 
 	private:
@@ -135,6 +132,9 @@ namespace hady
 		void togglePause() const;
 
 		bool getPause() const;
+
+	private:
+		void checkBingo();
 
 	public:
 		uint32 getBingoCount() const;

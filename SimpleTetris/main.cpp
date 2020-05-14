@@ -25,6 +25,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_simpleTetris.addFont(L"Jokerman", 46, false);
 	g_simpleTetris.addFont(L"휴먼매직체", 20, true);
 	g_simpleTetris.addFont(L"휴먼매직체", 45, true);
+	g_simpleTetris.addFont(L"굴림체", 85, true);
 
 	const Position2 boardPosition{ 10, 80 };
 	Color clearColor{ 240, 240, 255 };
@@ -158,7 +159,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			if (g_simpleTetris.getPause() == true)
 			{
-				g_simpleTetris.useFont(3);
+				g_simpleTetris.useFont(4);
 				g_simpleTetris.drawTextToScreen(Position2(0, 0), Size2(g_kWidth, g_kHeight), L"PAUSE"
 					, difaultColor, EHorzAlign::Center, EVertAlign::Center);
 			}
