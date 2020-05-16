@@ -625,7 +625,8 @@ void hady::SimpleTetris::restartGame()
 
 	//float * float은 연산 오버플로우가 발생하므로 앞의 하나를 double로 캐스팅 한다.
 	memset(_board, 0, (size_t)((double)kBoardSize.x * kBoardSize.y));
-	
+	//디버그용 블록
+#if defined DEBUG || _DEBUG
 	for (int y = kBoardSize.y - 1; y > kBoardSize.y - 3; --y)
 	{
 		for (int x = 0; x < kBoardSize.x; ++x)
@@ -634,7 +635,7 @@ void hady::SimpleTetris::restartGame()
 		}
 		_board[y][3] = 0;
 	}
-	
+#endif 
 
 	_nextBlockQueue.pop_front();
 	_nextBlockQueue.pop_front();
