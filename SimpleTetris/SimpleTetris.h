@@ -93,6 +93,7 @@ namespace hady
 
 	private:
 		EBlockType getRandomBlockType() const;
+		int32 getRandomBlockTypeInternal() const;
 
 	public:
 		void updateNextblockQueue();
@@ -205,6 +206,9 @@ namespace hady
 		bool					_isBingo{ false };
 		uint32					_comboCount{};
 		mutable bool			_isLevelup{ false };
+
+	private:
+		mutable int32			_prevRandomBlockType{};
 
 	private:
 		CheapTimer				_bingoTimer{};

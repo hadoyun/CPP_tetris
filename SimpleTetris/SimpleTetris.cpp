@@ -517,9 +517,19 @@ hady::EBlockType hady::SimpleTetris::getCurrBlockType() const
 
 hady::EBlockType hady::SimpleTetris::getRandomBlockType() const
 {
-	int32 iBlockType{ (int32)(((double)rand() / (double)(RAND_MAX + 1)) * 7.0) + 2 };
+	int32 iBlockType{ getRandomBlockTypeInternal() };
+	while (_prevRandomBlockType == iBlockType)
+	{
+		iBlockType = getRandomBlockTypeInternal();
+	}
+	_prevRandomBlockType = iBlockType;
 
 	return (EBlockType)iBlockType;
+}
+
+hady::int32 hady::SimpleTetris::getRandomBlockTypeInternal() const
+{
+	return (int32)(((double)rand() / (double)(RAND_MAX + 1)) * 7.0) + 2;
 }
 
 void hady::SimpleTetris::updateNextblockQueue()
