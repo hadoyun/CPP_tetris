@@ -7,32 +7,43 @@ namespace hady
 {
 	CheapTimer::CheapTimer()
 	{
-		
+
 	}
 
 	CheapTimer::~CheapTimer()
 	{
 
 	}
-	
+
 	void CheapTimer::set(uint32 interval, EUnit unit)
 	{
 		_unit = unit;
 
 		_interval = interval;
+
+		start();
 	}
 
 	void CheapTimer::reset()
 	{
-		start();
+		_startTime = std::chrono::steady_clock::now().time_since_epoch().count();
+
+		_tickCount = 0;
 	}
 
 	void CheapTimer::start()
 	{
-		_startTime = std::chrono::steady_clock::now().time_since_epoch().count();
+		_isTicking = true;
+		
+		reset();
 	}
 
-	bool CheapTimer::tick() const
+	void CheapTimer::stop()
+	{
+		_isTicking = false;
+	}
+
+	void CheapTimer::update()
 	{
 		uint64 elapsed = std::chrono::steady_clock::now().time_since_epoch().count() - _startTime;
 
@@ -55,7 +66,26 @@ namespace hady
 			break;
 		}
 
-		if (elapsed >= _interval) return true;
-		return false;
+		if (elapsed >= _interval)
+		{
+			++_tickCount;	
+		}
+	}
+
+	bool CheapTimer::tick()
+	{	
+		//조건문이 명령문의 중간에 들어갈 수 있다. 
+		//return (_tickCount > 0) ? true : false;
+		update();
+
+		if ((_isTicking == true) && (_tickCount > 0))
+		{
+			reset();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

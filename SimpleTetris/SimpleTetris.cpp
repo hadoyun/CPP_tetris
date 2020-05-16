@@ -1,10 +1,10 @@
 ﻿#include "SimpleTetris.h"
 #include <thread>
-
+#include <cassert>
 
 hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
 {
-	__noop;
+	_bingoTimer.set(150, CheapTimer::EUnit::milli);
 }
 
 hady::SimpleTetris::~SimpleTetris()
@@ -20,13 +20,14 @@ void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WND
 		srand(std::chrono::steady_clock::now().time_since_epoch().count());
 
 		createBlock(EBlockType::Used, Color(100, 100, 100));
-		createBlock(EBlockType::I, Color(255, 60, 60));
-		createBlock(EBlockType::T, Color(160, 80, 200));
+		createBlock(EBlockType::I, Color(60, 220, 255));
+		createBlock(EBlockType::T, Color(160, 100, 255));
 		createBlock(EBlockType::O, Color(255, 255, 0));
-		createBlock(EBlockType::L, Color(255, 200, 0));
-		createBlock(EBlockType::InvL, Color(0, 180, 255));
-		createBlock(EBlockType::Z, Color(40, 255, 40));
-		createBlock(EBlockType::S, Color(255, 127, 255));
+		createBlock(EBlockType::L, Color(0, 0, 220));
+		createBlock(EBlockType::InvL, Color(255, 127, 0));
+		createBlock(EBlockType::Z, Color(255, 0, 0));
+		createBlock(EBlockType::S, Color(0, 255, 60));
+		createBlock(EBlockType::Bingo, Color(255, 255, 255));
 	}
 
 	{
@@ -252,7 +253,7 @@ void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WND
 
 void hady::SimpleTetris::drawGuideBlock(Position2 boardOffset)
 {
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
+	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 	bool shouldDraw{ false };
 	//max = 둘 중 큰 숫자를 가져오는 매크로임. 따라서 최소값을 지정하려면 max를 사용해야 함.(더 작은 숫자를 무시함.)
 	for (int i = max(_currPosition.y, 0); i < kBoardSize.y; ++i)
@@ -293,7 +294,7 @@ void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bo
 	drawRectangleToScreen(boardOffset, kBoardSizePixel, boardColor);
 
 	// 현재 블록
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection);
+	setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
 	drawGrid(boardOffset);
 
@@ -339,7 +340,8 @@ void hady::SimpleTetris::drawGrid(const hady::Position2& startPosition)
 
 bool hady::SimpleTetris::move(EDirection eDirection)
 {
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
+	//현재 블록을 지운다.
+	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	switch (eDirection)
 	{
@@ -368,9 +370,10 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 		}
 		else
 		{
-			drawBlockToBoard(_currBlockType, _currPosition, _currDirection);
+			//지워진 현재 블록을 다시 그림 
+			setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
-			if (_currPosition.y < 0)
+			if (_currPosition.y < -1)
 			{
 				_isGameOver = true;
 			}
@@ -398,17 +401,27 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 	return false;
 }
 
-void hady::SimpleTetris::rotate()
+void hady::SimpleTetris::rotate(bool clockWise)
 {
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
+	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	int32 currDirection{ int32(_currDirection) };
 
-	++currDirection;
-
-	if (currDirection == 4)
+	if (clockWise == true)
 	{
-		currDirection = 0;
+		++currDirection;
+		if (currDirection == 4)
+		{
+			currDirection = 0;
+		}
+	}
+	else
+	{
+		--currDirection;
+		if (currDirection == -1)
+		{
+			currDirection = 3;
+		}
 	}
 
 	EDirection nextDirection = EDirection(currDirection);
@@ -478,7 +491,7 @@ const hady::Position2& hady::SimpleTetris::getCurrPosition() const
 
 void hady::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
 {
-	drawBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
+	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	if (canDrawBlock(eBlockType, _currPosition, _currDirection) == true)
 	{
@@ -486,7 +499,7 @@ void hady::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
 	}
 	else
 	{
-		drawBlockToBoard(_currBlockType, _currPosition, _currDirection);
+		setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 	}
 }
 
@@ -605,18 +618,28 @@ void hady::SimpleTetris::restartGame()
 
 	//float * float은 연산 오버플로우가 발생하므로 앞의 하나를 double로 캐스팅 한다.
 	memset(_board, 0, (size_t)((double)kBoardSize.x * kBoardSize.y));
+	
+	for (int y = kBoardSize.y - 1; y > kBoardSize.y - 3; --y)
+	{
+		for (int x = 0; x < kBoardSize.x; ++x)
+		{
+			_board[y][x] = 1;
+		}
+		_board[y][3] = 0;
+	}
+	
 
 	_nextBlockQueue.pop_front();
 	_nextBlockQueue.pop_front();
 	_nextBlockQueue.pop_front();
 
 	_currScore = 0;
-	_bingoCount = 0;
+	_comboCount = 0;
 }
 
 hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 {
-	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), -(kBlockContainerSize * 0.5) };
+	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), -(kBlockContainerSize * 0.25) };
 
 	return result;
 }
@@ -625,8 +648,6 @@ void hady::SimpleTetris::checkBingo()
 {
 	int32 currY{ (int32)kBoardSize.y - 1 };
 	
-
-
 	while (currY >= 0)
 	{
 		bool isBingo{ true };
@@ -642,27 +663,41 @@ void hady::SimpleTetris::checkBingo()
 		}
 
 		if (isBingo == true)
-		{
-			//memset(_board[currY], 0, (size_t)kBoardSize.x);
+		{	
+			_bingoLines.emplace_back(currY);
 
-			for (int32 y = currY - 1; y >= 0; --y)
-			{
-				memcpy(_board[y + 1], _board[y], (size_t)kBoardSize.x);
-			}
+			changeBingoLineColor(currY);
 
-			++_bingoCount;
+			_bingoTimer.start();
 		}
-		else
-		{
-			--currY;
-		}
+		--currY;
 	}
 
-	uint32 deltaScore{ (_bingoCount * _bingoCount) * 100 };
+	uint32 deltaScore{ (uint32)_bingoLines.size() * (uint32)_bingoLines.size() * 100 };
 
 	_currScore += deltaScore;
 	_currLevelScore += deltaScore;
 	_comboCount = 0;
+}
+
+void hady::SimpleTetris::changeBingoLineColor(int32 bingoedY)
+{
+	assert(bingoedY >= 0);
+	assert(bingoedY < (int32)kBoardSize.y);
+
+	for (int32 x = 0; x < (int32)kBoardSize.x; ++x)
+	{
+		_board[bingoedY][x] = (int32)EBlockType::Bingo;
+	}
+}
+
+void hady::SimpleTetris::clearBingoLine(int32 bingoedY)
+{
+	for (int32 y = bingoedY; y > 0; --y)
+	{
+		memcpy(_board[y], _board[y - 1], (size_t)kBoardSize.x);
+	}
+	memset(_board[0], 0, (size_t)kBoardSize.x);
 }
 
 void hady::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
@@ -688,7 +723,7 @@ void hady::SimpleTetris::drawBlockUnitToImage(EBlockType eBlockType, const Posit
 		Size2(kBlockBorder, kBlockSize.y - 1), Color::add(color, Color(60, 60, 60)), alpha);
 }
 
-void hady::SimpleTetris::drawBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase)
+void hady::SimpleTetris::setBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase)
 {
 	const int32 x{ int32(position.x) };
 	const int32 y{ int32(position.y) };
@@ -768,14 +803,14 @@ bool hady::SimpleTetris::getPause() const
 	return _pause;
 }
 
-hady::uint32 hady::SimpleTetris::getBingoCount() const
+hady::uint32 hady::SimpleTetris::getComboCount() const
 {
-	return _bingoCount;
+	return _comboCount;
 }
 
 void hady::SimpleTetris::addComboCount()
 {
-	++_bingoCount;
+	++_comboCount;
 }
 
 bool hady::SimpleTetris::getGameLevelUp() const
@@ -786,4 +821,20 @@ bool hady::SimpleTetris::getGameLevelUp() const
 void hady::SimpleTetris::resetGameLevelUp()
 {
 	_isLevelup = false;
+}
+
+bool hady::SimpleTetris::update()
+{
+	if (_bingoTimer.tick() == true)
+	{
+		//의미 상 비교 크게 3부분 
+		while (_bingoLines.size() > 0)
+		{
+			clearBingoLine(_bingoLines.back());
+			_bingoLines.pop_back();
+		}
+		_bingoTimer.stop();
+	}
+
+	return __super::update();
 }

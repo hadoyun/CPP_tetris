@@ -3,6 +3,7 @@
 #include "GraphicalWindow.h"
 //#include <queue>
 #include <deque>
+#include "CheapTimer.h"
 
 namespace hady
 {
@@ -48,6 +49,7 @@ namespace hady
 		InvL, // Skyblue
 		Z, // green
 		S, // Pink
+		Bingo,
 		MAX
 	};
 
@@ -77,7 +79,7 @@ namespace hady
 
 	public:
 		bool move(EDirection eDirection);
-		void rotate();
+		void rotate(bool clockWise);
 
 	private:
 		const bool getRotatablePosition(EDirection eNextDirection, hady::Position2& outPosition) const;
@@ -122,7 +124,7 @@ namespace hady
 
 	private:
 		void drawBlockUnitToImage(EBlockType eBlockType, const Position2& position, const Color& color, uint8 alpha = 255);
-		void drawBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase = false);
+		void setBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase = false);
 		void drawBlockToScreen(EBlockType eBlockType, const Position2& position, EDirection eDirection);
 
 	private:
@@ -135,12 +137,17 @@ namespace hady
 
 	private:
 		void checkBingo();
+		void changeBingoLineColor(int32 bingoedY);
+		void clearBingoLine(int32 bingoedY);
 
 	public:
-		uint32 getBingoCount() const;
+		uint32 getComboCount() const;
 		void addComboCount();
 		bool getGameLevelUp() const;
 		void resetGameLevelUp();
+
+	public:
+		virtual bool update() override;
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
@@ -156,17 +163,19 @@ namespace hady
 	private:
 		BlockContainer			_blocks[(uint32)EBlockType::MAX][(uint32)EDirection::MAX]{};
 
-		// image의 index
 	private:
+		// ii == image의 index
 		uint32					_iiBlocks[(uint32)EBlockType::MAX]{};
 
 	private:
-		uint8					_board[uint32(kBoardSize.y)][uint32(kBoardSize.x)]{};
+		//보드의 각 항목은 eblocks의 한 항목의 값이다.
+		uint8					_board[uint32(kBoardSize.y + 1)][uint32(kBoardSize.x)]{};
+		//
 
 	private:
 		// 밀리초 = ms
 		// 마이크로초 = us (그리스어 뮤랑 제일 닮아서)
-		int32					_gameSpeed{ 2000 };
+		int32					_gameSpeed{ 1000 };
 		mutable std::chrono::steady_clock::time_point _prevTime{};
 
 	private:
@@ -193,8 +202,12 @@ namespace hady
 
 	private:
 		bool					_isBingo{ false };
-		uint32					_bingoCount{};
 		uint32					_comboCount{};
 		mutable bool			_isLevelup{ false };
+
+	private:
+		CheapTimer				_bingoTimer{};
+		//double ended queue
+		std::deque<uint32>		_bingoLines{};
 	};
 }

@@ -37,7 +37,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	CheapTimer levelUpTimer{};
 	levelUpTimer.set(1'500, CheapTimer::EUnit::milli);
-	levelUpTimer.start();
 
 	while (g_simpleTetris.update() == true)
 	{
@@ -61,26 +60,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					{
 						g_simpleTetris.move(EDirection::W);
 					}
-					if (GetAsyncKeyState(VK_UP) == SHORT(0x8001))
+					if (GetAsyncKeyState('Z') == SHORT(0x8001))
 					{
 						//g_simpleTetris.move(EDirection::N);
-						g_simpleTetris.rotate();
+						g_simpleTetris.rotate(true);
+					}
+					if (GetAsyncKeyState('X') == SHORT(0x8001))
+					{
+						//g_simpleTetris.move(EDirection::N);
+						g_simpleTetris.rotate(false);
 					}
 					if (GetAsyncKeyState(VK_DOWN) == SHORT(0x8001))
 					{
 						g_simpleTetris.move(EDirection::S);
 					}
-					if (GetAsyncKeyState(VK_SPACE) == SHORT(0x8001))
+					if (GetAsyncKeyState(VK_UP) == SHORT(0x8001))
 					{
 						while (g_simpleTetris.move(EDirection::S) == true)
 						{
 
 						}
 						//g_simpleTetris.rotate();
-					}
-					if (g_simpleTetris.tickGameSpeedTimer() == true)
-					{
-						g_simpleTetris.move(EDirection::S);
 					}
 				}
 				if (GetAsyncKeyState('P') == SHORT(0x8001))
@@ -106,6 +106,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				}
 #endif 
 
+			}
+
+			if (g_simpleTetris.tickGameSpeedTimer() == true)
+			{
+				g_simpleTetris.move(EDirection::S);
 			}
 		}
 
@@ -144,7 +149,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			
 			g_simpleTetris.useFont(3);
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 465), L"COMBO " 
-				+ std::to_wstring(g_simpleTetris.getBingoCount()), difaultColor);
+				+ std::to_wstring(g_simpleTetris.getComboCount()), difaultColor);
 
 			if (g_simpleTetris.isGameOver() == true)
 			{
