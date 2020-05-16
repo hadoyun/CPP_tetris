@@ -373,14 +373,21 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 			//지워진 현재 블록을 다시 그림 
 			setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
-			if (_currPosition.y < -1)
+			if (_currPosition == getInitialBlockPosition())
 			{
 				_isGameOver = true;
 			}
 
+			// 새 블록 스폰
 			_currDirection = EDirection::N;
 			_currPosition = getInitialBlockPosition();
 			_currBlockType = _nextBlockQueue.front();
+
+			//
+			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
+			{
+				_isGameOver = true;
+			}
 
 			_nextBlockQueue.pop_front();
 
@@ -639,7 +646,7 @@ void hady::SimpleTetris::restartGame()
 
 hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 {
-	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), -(kBlockContainerSize * 0.25) };
+	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), 0 };
 
 	return result;
 }
@@ -693,11 +700,10 @@ void hady::SimpleTetris::changeBingoLineColor(int32 bingoedY)
 
 void hady::SimpleTetris::clearBingoLine(int32 bingoedY)
 {
-	for (int32 y = bingoedY; y > 0; --y)
+	for (int32 y = bingoedY; y > -3; --y)
 	{
 		memcpy(_board[y], _board[y - 1], (size_t)kBoardSize.x);
 	}
-	memset(_board[0], 0, (size_t)kBoardSize.x);
 }
 
 void hady::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
@@ -737,7 +743,7 @@ void hady::SimpleTetris::setBlockToBoard(EBlockType eBlockType, const Position2&
 			const int32 finalY{ y + y_ };
 			const uint8 blockValue{ block.data[y_][x_] };
 			if (blockValue == 0) continue;
-			if (finalY < 0 || finalY >= (int32)kBoardSize.y) continue;
+			if (finalY <= -kBlockContainerSize || finalY >= (int32)kBoardSize.y) continue;
 			if (finalX < 0 || finalX >= (int32)kBoardSize.x) continue;
 			_board[finalY][finalX] = blockType;
 		}

@@ -168,14 +168,15 @@ namespace hady
 		uint32					_iiBlocks[(uint32)EBlockType::MAX]{};
 
 	private:
-		//보드의 각 항목은 eblocks의 한 항목의 값이다.
+		// 코드의 단순화를 위한 의도적 버퍼 오버런!
+		uint8					_boardExtra[kBlockContainerSize][uint32(kBoardSize.x)]{};
+		// 보드의 각 항목은 eblocks의 한 항목의 값이다.
 		uint8					_board[uint32(kBoardSize.y + 1)][uint32(kBoardSize.x)]{};
-		//
 
 	private:
 		// 밀리초 = ms
 		// 마이크로초 = us (그리스어 뮤랑 제일 닮아서)
-		int32					_gameSpeed{ 1000 };
+		int32					_gameSpeed{ 1400 };
 		mutable std::chrono::steady_clock::time_point _prevTime{};
 
 	private:
@@ -194,7 +195,7 @@ namespace hady
 
 
 	private:
-		bool _isGameOver{ false };
+		bool					_isGameOver{ false };
 
 		uint8 _blockspwansCounts[uint32(EBlockType::MAX)][uint32(EBlockType::MAX)]{};
 
