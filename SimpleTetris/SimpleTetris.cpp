@@ -23,8 +23,8 @@ void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WND
 		createBlock(EBlockType::I, Color(60, 220, 255));
 		createBlock(EBlockType::T, Color(160, 100, 255));
 		createBlock(EBlockType::O, Color(255, 255, 0));
-		createBlock(EBlockType::L, Color(0, 0, 220));
-		createBlock(EBlockType::InvL, Color(255, 127, 0));
+		createBlock(EBlockType::L, Color(255, 127, 0));
+		createBlock(EBlockType::InvL, Color(0, 0, 220));
 		createBlock(EBlockType::Z, Color(255, 0, 0));
 		createBlock(EBlockType::S, Color(0, 255, 60));
 		createBlock(EBlockType::Bingo, Color(255, 255, 255));
@@ -379,9 +379,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 			}
 
 			// 새 블록 스폰
-			_currDirection = EDirection::N;
-			_currPosition = getInitialBlockPosition();
-			_currBlockType = _nextBlockQueue.front();
+			spawnNewBlock();
 
 			//
 			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
@@ -618,8 +616,8 @@ void hady::SimpleTetris::restartGame()
 {
 	_isGameOver = false;
 
-	_currPosition = getInitialBlockPosition();
-	_currBlockType = getRandomBlockType();
+	spawnNewBlock();
+
 	_currLevel = 1;
 	_currScore = 0;
 	_currLevelScore = 0;
@@ -653,6 +651,43 @@ void hady::SimpleTetris::restartGame()
 
 	_currScore = 0;
 	_comboCount = 0;
+}
+
+void hady::SimpleTetris::spawnNewBlock()
+{
+	_currBlockType = _nextBlockQueue.front();
+	switch (_currBlockType)
+	{
+	case hady::EBlockType::I:
+		_currDirection = EDirection::E;
+		break;
+	case hady::EBlockType::T:
+		_currDirection = EDirection::N;
+		break;
+	case hady::EBlockType::O:
+		_currDirection = EDirection::N;
+		break;
+	case hady::EBlockType::L:
+		_currDirection = EDirection::E;
+		break;
+	case hady::EBlockType::InvL:
+		_currDirection = EDirection::W;
+		break;
+	case hady::EBlockType::Z:
+		_currDirection = EDirection::E;
+		break;
+	case hady::EBlockType::S:
+		_currDirection = EDirection::W;
+		break;
+	case hady::EBlockType::None:
+	case hady::EBlockType::Used:
+	case hady::EBlockType::Bingo:
+	case hady::EBlockType::MAX:
+		break;
+	default:
+		break;
+	}
+	_currPosition = getInitialBlockPosition();
 }
 
 hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const

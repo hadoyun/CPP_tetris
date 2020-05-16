@@ -116,6 +116,7 @@ namespace hady
 
 	public:
 		void restartGame();
+		void spawnNewBlock();
 
 	private:
 		Position2 getInitialBlockPosition() const;
