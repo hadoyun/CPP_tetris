@@ -14,6 +14,7 @@ hady::SimpleTetris::~SimpleTetris()
 
 void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
+	//
 	{
 		createInternal(title, hInstance, windowProc);
 
@@ -362,7 +363,8 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 		}
 		break;
 	case hady::EDirection::S:
-		if (canDrawBlock(_currBlockType, _currPosition + Position2(0, 1), _currDirection) == true)
+		if ((canDrawBlock(_currBlockType, _currPosition + Position2(0, 1), _currDirection) == true) 
+			&& (_pause == false))
 		{
 			_currPosition.y += 1;
 
@@ -373,23 +375,25 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 			//지워진 현재 블록을 다시 그림 
 			setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
-			if (_currPosition == getInitialBlockPosition())
+			if (_currPosition == getInitialBlockPosition() && _pause == false) 
 			{
 				_isGameOver = true;
 			}
 
 			// 새 블록 스폰
-			spawnNewBlock();
-
-			//
-			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
+			if (_pause == false)
 			{
-				_isGameOver = true;
+				spawnNewBlock();
+
+				if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
+				{
+					_isGameOver = true;
+				}
+
+				_nextBlockQueue.pop_front();
+
+				checkBingo();
 			}
-
-			_nextBlockQueue.pop_front();
-
-			checkBingo();
 		}
 		break;
 	case hady::EDirection::E:
@@ -690,6 +694,7 @@ void hady::SimpleTetris::spawnNewBlock()
 	_currPosition = getInitialBlockPosition();
 }
 
+// 새로운 시작 블록 포지션
 hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 {
 	Position2 result{ (kBoardSize.x * 0.5) - (kBlockContainerSize * 0.5), 0 };
@@ -697,17 +702,18 @@ hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 	return result;
 }
 
+//빙고 체크하기 
 void hady::SimpleTetris::checkBingo()
 {
-	int32 currY{ (int32)kBoardSize.y - 1 };
+	int32 checkY{ (int32)kBoardSize.y - 1 };
 	
-	while (currY >= 0)
+	while (checkY >= 0)
 	{
 		bool isBingo{ true };
 
 		for (uint32 x = 0; x < (uint32)kBoardSize.x; ++x)
 		{
-			if (_board[currY][x] == 0)
+			if (_board[checkY][x] == 0)
 			{
 				isBingo = false;
 
@@ -717,13 +723,13 @@ void hady::SimpleTetris::checkBingo()
 
 		if (isBingo == true)
 		{	
-			_bingoLines.emplace_back(currY);
+			_bingoLines.emplace_back(checkY);
 
-			changeBingoLineColor(currY);
+			changeBingoLineColor(checkY);
 
 			_bingoTimer.start();
 		}
-		--currY;
+		--checkY;
 	}
 
 	uint32 deltaScore{ (uint32)_bingoLines.size() * (uint32)_bingoLines.size() * 100 };
@@ -735,9 +741,11 @@ void hady::SimpleTetris::checkBingo()
 
 void hady::SimpleTetris::changeBingoLineColor(int32 bingoedY)
 {
+	//빙고 체크는 화면에 나오는 곳 까지
 	assert(bingoedY >= 0);
 	assert(bingoedY < (int32)kBoardSize.y);
 
+	//빙고가 된 행을 EBlockType::Bingo(흰색)로 대입한다.
 	for (int32 x = 0; x < (int32)kBoardSize.x; ++x)
 	{
 		_board[bingoedY][x] = (int32)EBlockType::Bingo;

@@ -7,6 +7,7 @@
 
 namespace hady
 {
+	// 코드의 단순화를 위해 다양한 블록을 담는 4*4 구조체
 	struct BlockContainer
 	{
 		uint8 data[4][4]{};
@@ -37,7 +38,7 @@ namespace hady
 			data[3][3] = _33;
 		}
 	};
-
+	//블록을 종류를 담은 Enum
 	enum class EBlockType
 	{
 		None,
@@ -52,7 +53,7 @@ namespace hady
 		Bingo,
 		MAX
 	};
-
+	//블록의 방향을 알려주는 Enum
 	enum class EDirection
 	{
 		N,
@@ -61,7 +62,7 @@ namespace hady
 		E,
 		MAX
 	};
-
+	
 	class SimpleTetris final : public IGraphicalWindow
 	{
 	public:
@@ -69,6 +70,7 @@ namespace hady
 		~SimpleTetris();
 
 	public:
+		//
 		virtual void set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) override;
 
 		void drawGuideBlock(Position2 boardOffset);
@@ -138,7 +140,9 @@ namespace hady
 		bool getPause() const;
 
 	private:
+		//빙고를 체크함
 		void checkBingo();
+		//체크된 빙고 줄을 받아서 (특정색으로 바꿔줌)
 		void changeBingoLineColor(int32 bingoedY);
 		void clearBingoLine(int32 bingoedY);
 

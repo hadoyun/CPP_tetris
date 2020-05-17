@@ -83,10 +83,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 						//g_simpleTetris.rotate();
 					}
 				}
-				if (GetAsyncKeyState('P') == SHORT(0x8001))
-				{
-					g_simpleTetris.togglePause();
-				}
+
 #if defined DEBUG || _DEBUG
 				if (GetAsyncKeyState('W') == SHORT(0x8001))
 				{
@@ -107,10 +104,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif 
 
 			}
-
 			if (g_simpleTetris.tickGameSpeedTimer() == true)
 			{
 				g_simpleTetris.move(EDirection::S);
+			}
+			if (GetAsyncKeyState('P') == SHORT(0x8001))
+			{
+				g_simpleTetris.togglePause();
 			}
 		}
 
