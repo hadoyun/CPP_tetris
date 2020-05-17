@@ -49,7 +49,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if (g_simpleTetris.tickInput() == true)
 			{
-				if (g_simpleTetris.getPause() == false)
+				if (g_simpleTetris.getPause() == true)
+				{
+					__noop;
+				}
+				else
 				{
 					//0x8001: key가 처음 눌렸을 때를 의미함.
 					if (GetAsyncKeyState(VK_LEFT) == SHORT(0x8001))
@@ -82,6 +86,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 						}
 						//g_simpleTetris.rotate();
 					}
+					if (g_simpleTetris.tickGameSpeedTimer() == true)
+					{
+						g_simpleTetris.move(EDirection::S);
+					}
+				}
+				if (GetAsyncKeyState('P') == SHORT(0x8001))
+				{
+					g_simpleTetris.togglePause();
 				}
 
 #if defined DEBUG || _DEBUG
@@ -102,15 +114,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					g_simpleTetris.setCurrBlockType((EBlockType)iNextBlockType);
 				}
 #endif 
-
-			}
-			if (g_simpleTetris.tickGameSpeedTimer() == true)
-			{
-				g_simpleTetris.move(EDirection::S);
-			}
-			if (GetAsyncKeyState('P') == SHORT(0x8001))
-			{
-				g_simpleTetris.togglePause();
 			}
 		}
 

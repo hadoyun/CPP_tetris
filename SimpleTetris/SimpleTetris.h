@@ -66,6 +66,7 @@ namespace hady
 	class SimpleTetris final : public IGraphicalWindow
 	{
 	public:
+		// 시작시 클레스 빙고 타이머 선언한다.
 		SimpleTetris(int32 width, int32 height);
 		~SimpleTetris();
 
@@ -109,21 +110,28 @@ namespace hady
 		void updateGameLevel();
 
 	public:
+		// _CurrScore를 가져온다.
 		uint32 getCurrScore() const;
+		// _CurrLevel를 가져온다.
 		uint32 getCurrLevel() const;
+		// _CurrLevelScore를 가져온다.
 		uint32 getCurrLevelScore() const;
 
 	public:
 		bool isGameOver() const;
-
+	
+	// 게임 시작과 블록 리스폰
 	public:
+		// 게임을 재시작, 현재 레벨, 스코어, 경험치, 콤보 등을 초기화하고, 보드를 비운다.
 		void restartGame();
+		// 대기 Queue의 블록을 현재 블록타입으로 만들고, 현재 위치를 시작 위치로 만든다.
 		void spawnNewBlock();
-
 	private:
+		// 게임시작시, 블록의 처음 포지션을 리턴해주는 함수
 		Position2 getInitialBlockPosition() const;
-
+	
 	private:
+
 		void createBlock(EBlockType eBlockType, const Color& color, uint8 alpha = 255);
 
 	private:
@@ -153,6 +161,8 @@ namespace hady
 		void resetGameLevelUp();
 
 	public:
+		//GraphicalWindow에서 상속받은 uqdate
+		//
 		virtual bool update() override;
 
 	public:
@@ -196,7 +206,7 @@ namespace hady
 	private:
 		uint32					_currLevel{};
 		uint32					_currScore{};
-		uint32					_currLevelScore{};
+		uint32					_currExe{};
 		uint32					_scoreForNextLevel{ 10 };
 
 

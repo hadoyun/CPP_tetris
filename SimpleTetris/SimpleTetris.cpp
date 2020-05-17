@@ -14,23 +14,24 @@ hady::SimpleTetris::~SimpleTetris()
 
 void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
-	//
+
 	{
+		// ???
 		createInternal(title, hInstance, windowProc);
-
+		// ???
 		srand(std::chrono::steady_clock::now().time_since_epoch().count());
-
-		createBlock(EBlockType::Used, Color(100, 100, 100));
-		createBlock(EBlockType::I, Color(60, 220, 255));
-		createBlock(EBlockType::T, Color(160, 100, 255));
-		createBlock(EBlockType::O, Color(255, 255, 0));
-		createBlock(EBlockType::L, Color(255, 127, 0));
-		createBlock(EBlockType::InvL, Color(0, 0, 220));
-		createBlock(EBlockType::Z, Color(255, 0, 0));
-		createBlock(EBlockType::S, Color(0, 255, 60));
-		createBlock(EBlockType::Bingo, Color(255, 255, 255));
+		
+		createBlock(EBlockType::Used,	Color(100, 100, 100));
+		createBlock(EBlockType::I,		Color(060, 220, 255));
+		createBlock(EBlockType::T,		Color(160, 100, 255));
+		createBlock(EBlockType::O,		Color(255, 255, 000));
+		createBlock(EBlockType::L,		Color(255, 127, 000));
+		createBlock(EBlockType::InvL,	Color(000, 000, 220));
+		createBlock(EBlockType::Z,		Color(255, 000, 000));
+		createBlock(EBlockType::S,		Color(000, 255, 060));
+		createBlock(EBlockType::Bingo,	Color(255, 255, 255));
 	}
-
+	//각 블록을 넣는다.
 	{
 		// I형 블록
 		{
@@ -582,10 +583,10 @@ bool hady::SimpleTetris::tickGameSpeedTimer() const
 
 void hady::SimpleTetris::updateGameLevel()
 {
-	if (_currLevelScore >= _scoreForNextLevel && _currLevel < 100)
+	if (_currExe >= _scoreForNextLevel && _currLevel < 100)
 	{
 		++_currLevel;
-		_currLevelScore = 0;
+		_currExe = 0;
 		_scoreForNextLevel += 500;
 
 		if (_gameSpeed > 50)
@@ -608,7 +609,7 @@ hady::uint32 hady::SimpleTetris::getCurrLevel() const
 
 hady::uint32 hady::SimpleTetris::getCurrLevelScore() const
 {
-	return _currLevelScore;
+	return _currExe;
 }
 
 bool hady::SimpleTetris::isGameOver() const
@@ -624,7 +625,7 @@ void hady::SimpleTetris::restartGame()
 
 	_currLevel = 1;
 	_currScore = 0;
-	_currLevelScore = 0;
+	_currExe = 0;
 
 	//memset으로 하면 됨.
 	/*for (int32 y = 0; y < (int32)kBoardSize.y; ++y)
@@ -636,10 +637,12 @@ void hady::SimpleTetris::restartGame()
 	}*/
 
 	//float * float은 연산 오버플로우가 발생하므로 앞의 하나를 double로 캐스팅 한다.
+	//보드를 비운다.
 	memset(_board, 0, (size_t)((double)kBoardSize.x * kBoardSize.y));
+
 	//디버그용 블록
 #if defined DEBUG || _DEBUG
-	for (int y = kBoardSize.y - 1; y > kBoardSize.y - 3; --y)
+	for (int y = kBoardSize.y - 1; y > kBoardSize.y - 4; --y)
 	{
 		for (int x = 0; x < kBoardSize.x; ++x)
 		{
@@ -705,15 +708,15 @@ hady::Position2 hady::SimpleTetris::getInitialBlockPosition() const
 //빙고 체크하기 
 void hady::SimpleTetris::checkBingo()
 {
-	int32 checkY{ (int32)kBoardSize.y - 1 };
+	int32 bingoY{ (int32)kBoardSize.y - 1 };
 	
-	while (checkY >= 0)
+	while (bingoY >= 0)
 	{
 		bool isBingo{ true };
 
 		for (uint32 x = 0; x < (uint32)kBoardSize.x; ++x)
 		{
-			if (_board[checkY][x] == 0)
+			if (_board[bingoY][x] == 0)
 			{
 				isBingo = false;
 
@@ -723,19 +726,19 @@ void hady::SimpleTetris::checkBingo()
 
 		if (isBingo == true)
 		{	
-			_bingoLines.emplace_back(checkY);
+			_bingoLines.emplace_back(bingoY);
 
-			changeBingoLineColor(checkY);
+			changeBingoLineColor(bingoY);
 
 			_bingoTimer.start();
 		}
-		--checkY;
+		--bingoY;
 	}
 
 	uint32 deltaScore{ (uint32)_bingoLines.size() * (uint32)_bingoLines.size() * 100 };
 
 	_currScore += deltaScore;
-	_currLevelScore += deltaScore;
+	_currExe += deltaScore;
 	_comboCount = 0;
 }
 
@@ -759,7 +762,7 @@ void hady::SimpleTetris::clearBingoLine(int32 bingoedY)
 		memcpy(_board[y], _board[y - 1], (size_t)kBoardSize.x);
 	}
 }
-
+// _iiBlocks에 이미지를 대입하고, 블록 타입, 포지션, 색상, 알파에 따라 블록을 그린다.
 void hady::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
 {
 	_iiBlocks[(uint32)eBlockType] = createBlankImage(kBlockSize);
@@ -885,6 +888,7 @@ void hady::SimpleTetris::resetGameLevelUp()
 
 bool hady::SimpleTetris::update()
 {
+	//빙고 타이머가 
 	if (_bingoTimer.tick() == true)
 	{
 		//의미 상 비교 크게 3부분 
