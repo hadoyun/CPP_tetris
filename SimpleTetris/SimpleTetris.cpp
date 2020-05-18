@@ -2,6 +2,10 @@
 #include <thread>
 #include <cassert>
 
+#include <mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+
+
 hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
 {
 	_bingoTimer.set(150, CheapTimer::EUnit::milli);
@@ -408,7 +412,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 	}
 	return false;
 }
-
+ 
 void hady::SimpleTetris::rotate(bool clockWise)
 {	//블록 지우기
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
@@ -908,4 +912,9 @@ bool hady::SimpleTetris::update()
 	}
 
 	return __super::update();
+}
+
+void hady::SimpleTetris::musicOn()
+{
+	PlaySound(TEXT("../Music/Kiryu Kyosuke Harmonica Theme Full.mp3"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 }

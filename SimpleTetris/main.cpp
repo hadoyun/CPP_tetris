@@ -47,6 +47,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		g_simpleTetris.updateGameLevel();
 
+		if (g_simpleTetris.isGameOver() == false)
+		{
+			g_simpleTetris.musicOn();
+		}
 		//gameover가 아닌 상황.
 		if (g_simpleTetris.isGameOver() == false)
 		{	// ????
@@ -131,7 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 5), L"FPS: " + std::to_wstring(g_simpleTetris.getFps()), difaultColor);
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 25), L"SCORE: " + std::to_wstring(g_simpleTetris.getCurrScore()), difaultColor);
 			if (g_simpleTetris.getGameLevelUp() == true)
-			{	
+			{
 				if (levelUpTimer.tick() == false)
 				{
 					levelColor += Color(0.9f, 1.9f, 2.9f);

@@ -180,19 +180,21 @@ namespace hady
 		void clearBingoLine(int32 bingoedY);
 
 	public:
-		// 
 		uint32 getComboCount() const;
-
 		void addComboCount();
 
+		// getter
 		bool getGameLevelUp() const;
-		// _exe를 
+		// _exe를 리셋한다.
 		void resetGameLevelUp();
 
 	public:
 		// GraphicalWindow에서 상속받은 uqdate
 		// 빙고가 되서 사라지는 애니메이션 효과를 주기해 clearBingoLine() 함수를 호출한다.
 		virtual bool update() override;
+
+	public:
+		void musicOn();
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
