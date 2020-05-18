@@ -326,13 +326,13 @@ void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bo
 }
 
 void hady::SimpleTetris::drawGrid(const hady::Position2& startPosition)
-{
+{	// 가로 축을 그린다.
 	for (int y = 0; y < (int)kBoardSize.y; ++y)
 	{
 		drawLineToScreen(Position2(startPosition.x, startPosition.y + (y * kBlockSize.y))
 			, Position2((startPosition.x + kBoardSizePixel.x - 1), startPosition.y + (y * kBlockSize.y)), Color(250, 250, 250));
 	}
-
+	// 세로 축을 그린다.
 	for (int x = 0; x < (int)kBoardSize.x; ++x)
 	{
 		drawLineToScreen(Position2(startPosition.x + (x * kBlockSize.x), startPosition.y)
@@ -342,7 +342,7 @@ void hady::SimpleTetris::drawGrid(const hady::Position2& startPosition)
 
 bool hady::SimpleTetris::move(EDirection eDirection)
 {
-	//현재 블록을 지운다.
+	//현재 블록을 지운다. bErase = true
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	switch (eDirection)
@@ -350,30 +350,29 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 	case hady::EDirection::N:
 		if (canDrawBlock(_currBlockType, _currPosition - Position2(0, 1), _currDirection) == true)
 		{
-			_currPosition.y -= 1;
-
+			//이제 북쪽으론 움직이지 않기 때문에 필요 없다.
+			//_currPosition.y -= 1;
 			return true;
 		}
 		break;
 	case hady::EDirection::W:
 		if (canDrawBlock(_currBlockType, _currPosition + Position2(1, 0), _currDirection) == true)
-		{
+		{	// 오른쪽으로 이동
 			_currPosition.x += 1;
 
 			return true;
 		}
 		break;
 	case hady::EDirection::S:
-		if ((canDrawBlock(_currBlockType, _currPosition + Position2(0, 1), _currDirection) == true) 
-			&& (_pause == false))
-		{
+		if (canDrawBlock(_currBlockType, _currPosition + Position2(0, 1), _currDirection) == true)
+		{	//아래쪽으로 이동
 			_currPosition.y += 1;
 
 			return true;
 		}
 		else
 		{
-			//지워진 현재 블록을 다시 그림 
+			// 지워진 
 			setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
 			if (_currPosition == getInitialBlockPosition() && _pause == false) 
@@ -382,19 +381,18 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 			}
 
 			// 새 블록 스폰
-			if (_pause == false)
+			
+			spawnNewBlock();
+
+			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
 			{
-				spawnNewBlock();
-
-				if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
-				{
-					_isGameOver = true;
-				}
-
-				_nextBlockQueue.pop_front();
-
-				checkBingo();
+				_isGameOver = true;
 			}
+
+			_nextBlockQueue.pop_front();
+
+			checkBingo();
+			
 		}
 		break;
 	case hady::EDirection::E:
@@ -412,7 +410,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 }
 
 void hady::SimpleTetris::rotate(bool clockWise)
-{
+{	//블록 지우기
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
 	int32 currDirection{ int32(_currDirection) };
@@ -460,11 +458,13 @@ const bool hady::SimpleTetris::getRotatablePosition(EDirection eNextDirection, h
 	const auto& nextBlock{ _blocks[(uint32)_currBlockType][(uint32)eNextDirection] };
 	int32 minX{};
 	int32 maxX{};
+
 	for (int32 y = 0; y < 4; ++y)
 	{
 		for (int32 x = 0; x < 4; ++x)
 		{
 			const uint8 blockValue{ nextBlock.data[y][x] };
+			//회전시에 어떤 블록도 채워져 있지 않다면 계속해라
 			if (blockValue == 0) continue;
 
 			const int32 nextX{ (int32)_currPosition.x + x };
@@ -540,7 +540,7 @@ void hady::SimpleTetris::updateNextblockQueue()
 	while (_nextBlockQueue.size() < kNextBlockQueueMinSize)
 	{
 		_nextBlockQueue.push_back(getRandomBlockType());
-
+		// ???
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
@@ -583,11 +583,11 @@ bool hady::SimpleTetris::tickGameSpeedTimer() const
 
 void hady::SimpleTetris::updateGameLevel()
 {
-	if (_currExe >= _scoreForNextLevel && _currLevel < 100)
+	if (_currExe >= _ExeForLevelUp && _currLevel < 100)
 	{
 		++_currLevel;
 		_currExe = 0;
-		_scoreForNextLevel += 500;
+		_ExeForLevelUp += 500;
 
 		if (_gameSpeed > 50)
 		{
@@ -762,7 +762,7 @@ void hady::SimpleTetris::clearBingoLine(int32 bingoedY)
 		memcpy(_board[y], _board[y - 1], (size_t)kBoardSize.x);
 	}
 }
-// _iiBlocks에 이미지를 대입하고, 블록 타입, 포지션, 색상, 알파에 따라 블록을 그린다.
+
 void hady::SimpleTetris::createBlock(EBlockType eBlockType, const Color& color, uint8 alpha)
 {
 	_iiBlocks[(uint32)eBlockType] = createBlankImage(kBlockSize);
@@ -790,8 +790,10 @@ void hady::SimpleTetris::setBlockToBoard(EBlockType eBlockType, const Position2&
 {
 	const int32 x{ int32(position.x) };
 	const int32 y{ int32(position.y) };
-	const uint8 blockType{ (bErase == true) ? uint8(0) : uint8(eBlockType) };
+	// 삼항 연산자, bErase가 true면 None 번호(0)을 받는다. 아니라면 eBlockType의 번호(2~8)를 받는다
+	const uint8 blockType{ (bErase == true) ? uint8(EBlockType::None) : uint8(eBlockType) };
 	const auto& block = _blocks[(uint32)eBlockType][(uint32)eDirection];
+	// 해당 블록이 들어갈 수 잇는지 없는지 계산
 	for (int32 y_ = 0; y_ < 4; ++y_)
 	{
 		for (int32 x_ = 0; x_ < 4; ++x_)
@@ -802,6 +804,7 @@ void hady::SimpleTetris::setBlockToBoard(EBlockType eBlockType, const Position2&
 			if (blockValue == 0) continue;
 			if (finalY <= -kBlockContainerSize || finalY >= (int32)kBoardSize.y) continue;
 			if (finalX < 0 || finalX >= (int32)kBoardSize.x) continue;
+
 			_board[finalY][finalX] = blockType;
 		}
 	}
@@ -829,6 +832,7 @@ bool hady::SimpleTetris::canDrawBlock(EBlockType eBlockType, const Position2& po
 	const int32 x{ int32(position.x) };
 	const int32 y{ int32(position.y) };
 	const auto& block = _blocks[(uint32)eBlockType][(uint32)eDirection];
+	
 	for (int32 y_ = 0; y_ < 4; ++y_)
 	{
 		for (int32 x_ = 0; x_ < 4; ++x_)
@@ -836,17 +840,21 @@ bool hady::SimpleTetris::canDrawBlock(EBlockType eBlockType, const Position2& po
 			const int32 finalX{ x + x_ };
 			const int32 finalY{ y + y_ };
 			const uint8 blockValue{ block.data[y_][x_] };
-			if (blockValue == 0) continue;
+			// 블록이 들어갈 칸이 모두 비어있다면 블록은 들어갈 수 있다.
+			if (blockValue == 0) continue; 
+			// (x축) 보드 밖으로 나가면 안됀다.
 			if (finalX < 0 || finalX >= (int32)kBoardSize.x)
 			{
 				return false;
 			}
+			// ????
 			if (finalY < 0) continue;
+			// (y축을 기준으로) 보드 밖으로 나가면 안됀다.
 			if (finalY >= (int32)kBoardSize.y)
 			{
 				return false;
 			}
-
+			// ????
 			if (_board[finalY][finalX] != 0)
 			{
 				return false;
@@ -888,7 +896,6 @@ void hady::SimpleTetris::resetGameLevelUp()
 
 bool hady::SimpleTetris::update()
 {
-	//빙고 타이머가 
 	if (_bingoTimer.tick() == true)
 	{
 		//의미 상 비교 크게 3부분 

@@ -32,12 +32,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	const Color difaultColor{ 0, 0, 100 };
 	Color levelColor{ difaultColor };
 
-
+	//처음 시작해주기
 	g_simpleTetris.restartGame();
 	
+	//레벨업 애니메이션 효과를 위한 timer클레스 선언
 	CheapTimer levelUpTimer{};
+	// milli 단위로 설정
 	levelUpTimer.set(1'500, CheapTimer::EUnit::milli);
 
+	//게임은 계속해서 업데이트가 되어야한다.
 	while (g_simpleTetris.update() == true)
 	{
 		g_simpleTetris.updateNextblockQueue();
@@ -46,9 +49,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		//gameover가 아닌 상황.
 		if (g_simpleTetris.isGameOver() == false)
-		{
+		{	// ????
 			if (g_simpleTetris.tickInput() == true)
-			{
+			{	//퍼즈가 트루라면 입력을 받지 않고 움직이지 않기
 				if (g_simpleTetris.getPause() == true)
 				{
 					__noop;
@@ -82,9 +85,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					{
 						while (g_simpleTetris.move(EDirection::S) == true)
 						{
-
+							
 						}
-						//g_simpleTetris.rotate();
 					}
 					if (g_simpleTetris.tickGameSpeedTimer() == true)
 					{
@@ -92,7 +94,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					}
 				}
 				if (GetAsyncKeyState('P') == SHORT(0x8001))
-				{
+				{	//토클
 					g_simpleTetris.togglePause();
 				}
 
@@ -116,7 +118,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif 
 			}
 		}
-
+		
 		g_simpleTetris.beginRendering(clearColor);
 		{
 			g_simpleTetris.drawBoard(boardPosition, Color(0, 60, 100), Color(200, 200, 200));

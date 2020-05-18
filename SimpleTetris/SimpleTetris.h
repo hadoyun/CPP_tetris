@@ -38,6 +38,7 @@ namespace hady
 			data[3][3] = _33;
 		}
 	};
+	
 	//블록을 종류를 담은 Enum
 	enum class EBlockType
 	{
@@ -53,6 +54,7 @@ namespace hady
 		Bingo,
 		MAX
 	};
+	
 	//블록의 방향을 알려주는 Enum
 	enum class EDirection
 	{
@@ -71,42 +73,58 @@ namespace hady
 		~SimpleTetris();
 
 	public:
-		//
+		// ????
 		virtual void set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc) override;
-
+		// 넣을 수 있는 보드 Y축의 최대값을 묻고, 가능하다면 반 투명한 블록을 그린다.
 		void drawGuideBlock(Position2 boardOffset);
 
 	public:
+		// 판, 테두리, 현재 블록을 그린다.
 		void drawBoard(const Position2& boardOffset, const Color& borderColor, const Color& boardColor);
+		// board에 시각 효과를 높이기 위해 격자무늬 그리드를 그린다.
 		void drawGrid(const Position2& startPosition);
 
 	public:
+		// 블록이 해당 방향으로 이동시킨 후 bool 변수를 리턴한다.
 		bool move(EDirection eDirection);
+		// _currDirt를 바꾸고 그 에 따라 블록을 바꾼다.
 		void rotate(bool clockWise);
 
 	private:
+		// 회전이 가능한 지 묻고, 회전한 블록이 보드 밖으로 나가지 않게 한다.
 		const bool getRotatablePosition(EDirection eNextDirection, hady::Position2& outPosition) const;
 
 	public:
+		// 현재의 위치를 리턴한다. (계산용)
 		const Position2& getCurrPosition() const;
 
 	public:
+		// 디버깅용! 현재 블록에 바꾼 블록을 대입한다.
 		void setCurrBlockType(EBlockType eBlockType);
+		// 현재 블록 타입을 가져온다.
 		EBlockType getCurrBlockType() const;
 
 	private:
+		// 나온 숫자를 _prevblock에 넣고, 만약 중복되었다면 다른 enum을 뽑는다.
 		EBlockType getRandomBlockType() const;
+		// 랜덤으로 블록의 enum을 뽑아 uint32_t로 만든다
 		int32 getRandomBlockTypeInternal() const;
 
 	public:
+		// _nextNlockQueue에 블록 생성된 랜덤한 블록 타입을 넣는다.
 		void updateNextblockQueue();
 
 	public:
+		// 디버깅용, _gameSpeed를 입력받은 값으로 만든다.
 		void setTimerInterval(int32 interval);
+
+		// _gameSpeed의 값을 가져온다.
 		int32 getTimerInterval() const;
+		// 진행된 시간이 게임 스피드보다 크거나 같다면, 과거 시간을 현재 시간으로 바꾼 후 true를 리턴한다.
 		bool tickGameSpeedTimer() const;
 
 	public:
+		// 일정 경험치를 얻었다면 _currLevel을 업데이트한다.
 		void updateGameLevel();
 
 	public:
@@ -118,6 +136,7 @@ namespace hady
 		uint32 getCurrLevelScore() const;
 
 	public:
+		// _isGameOver를 리턴한다.
 		bool isGameOver() const;
 	
 	// 게임 시작과 블록 리스폰
@@ -131,52 +150,66 @@ namespace hady
 		Position2 getInitialBlockPosition() const;
 	
 	private:
-
+		// _iiBlocks에 이미지를 대입하고, 블록 타입, 포지션, 색상, 알파에 따라 블록을 그린다.
 		void createBlock(EBlockType eBlockType, const Color& color, uint8 alpha = 255);
 
 	private:
+		// _iiblocks에 저장되어있는 인덱스를 받아, 게임의 최소 단위인 사각형을 그린다.
 		void drawBlockUnitToImage(EBlockType eBlockType, const Position2& position, const Color& color, uint8 alpha = 255);
+		// 해당 위치에 해당 블록(eBlockType)이 들어갈 수 있는지 없는지 확인하고 있다면 _board에 해당 블록의 enum을 넣는다.
 		void setBlockToBoard(EBlockType eBlockType, const Position2& position, EDirection eDirection, bool bErase = false);
+		// eblockType의 _iiBlock[] 항목을 화면에 그린다.
 		void drawBlockToScreen(EBlockType eBlockType, const Position2& position, EDirection eDirection);
 
 	private:
+		// 해당 타입의 방향의 블록이 해당포지션으로 갈 수 있는지 없는지 확인해서 bool을 리턴한다.
 		bool canDrawBlock(EBlockType eBlockType, const Position2& position, EDirection eDirection) const;
 
 	public:
+		// 호출시 _pause 변수를 true / false로 변환(toggle)해주는 함수
 		void togglePause() const;
-
+		// getter for _pause
 		bool getPause() const;
 
 	private:
-		//빙고를 체크함
+		// 빙고를 체크함
 		void checkBingo();
-		//체크된 빙고 줄을 받아서 (특정색으로 바꿔줌)
+		// 체크된 빙고 번을 매개 변수로 받아 특정색으로 바꿔줌
 		void changeBingoLineColor(int32 bingoedY);
+		// 빙고가 되었다면, Y축을 Y - 1축으로 바꾼다.(???)
 		void clearBingoLine(int32 bingoedY);
 
 	public:
+		// 
 		uint32 getComboCount() const;
+
 		void addComboCount();
+
 		bool getGameLevelUp() const;
+		// _exe를 
 		void resetGameLevelUp();
 
 	public:
-		//GraphicalWindow에서 상속받은 uqdate
-		//
+		// GraphicalWindow에서 상속받은 uqdate
+		// 빙고가 되서 사라지는 애니메이션 효과를 주기해 clearBingoLine() 함수를 호출한다.
 		virtual bool update() override;
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
 		static constexpr float	kBlockBorder{ 2 };
+
 		static constexpr Size2	kBoardSize{ 10, 20 };
 		static constexpr Size2	kBoardSizePixel{ kBlockSize * kBoardSize };
 
 		static constexpr int32 kTimerIntervalMin{ 100 };
+
 		static constexpr int32 kBlockContainerSize{ 4 };
+		// next block queue
 		static constexpr int32 kNextBlockQueueMinSize{ 5 };
 		static constexpr int32 kNextBlockQueueMaxSize{ 20 };
 
 	private:
+		// 블록의 종류 10가지(Used / Bingo 포함) * 4방향
 		BlockContainer			_blocks[(uint32)EBlockType::MAX][(uint32)EDirection::MAX]{};
 
 	private:
@@ -196,24 +229,31 @@ namespace hady
 		mutable std::chrono::steady_clock::time_point _prevTime{};
 
 	private:
+		//현재 포지션
 		Position2				_currPosition{};
+		// 현재 블록 타입(default I)
 		EBlockType				_currBlockType{ EBlockType::I };
+		// 현재 블록 방향(default N)
 		EDirection				_currDirection{ EDirection::N };
-
+		
 	private:
-		std::deque<EBlockType> _nextBlockQueue{};
-
-	private:
+		// 현재 레벨
 		uint32					_currLevel{};
+		// 현재 스코어
 		uint32					_currScore{};
+		// 현재 경험치
 		uint32					_currExe{};
-		uint32					_scoreForNextLevel{ 10 };
+		// 레벨업을 위한 필요 경험치
+		uint32					_ExeForLevelUp{ 10 };
 
+	private:
+		// 다음 블록을 나타내기 위한 블록 큐(의미상)
+		std::deque<EBlockType> _nextBlockQueue{};
 
 	private:
 		bool					_isGameOver{ false };
 
-		uint8 _blockspwansCounts[uint32(EBlockType::MAX)][uint32(EBlockType::MAX)]{};
+		//uint8 _blockspwansCounts[uint32(EBlockType::MAX)][uint32(EBlockType::MAX)]{};
 
 		mutable bool			_pause{ false };
 
