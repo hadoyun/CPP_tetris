@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Asset">
+      <UniqueIdentifier>{11f7a5f1-5e9d-44d8-b2e5-68dc22eabfe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{5f6ca7d4-e80c-4a4f-a736-ad79de61fa93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fmod">
+      <UniqueIdentifier>{d2b4a76a-0920-4d67-96ee-878d16c6440d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -44,5 +53,71 @@
     <ClInclude Include="Common.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="..\FMOD\fmod.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod.hpp">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_codec.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_common.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_dsp.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_dsp_effects.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_errors.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FMOD\fmod_output.h">
+      <Filter>Fmod</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Asset\Kiryu Kyosuke Harmonica Theme Full.wav">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\chillout_lonley_pad_meditation_karma_ron.mp3">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\small_explosion.wav">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\laser_enemy.wav">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\big_explosion.wav">
+      <Filter>Asset</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\FMOD\fmod.cs">
+      <Filter>Fmod</Filter>
+    </None>
+    <None Include="..\FMOD\fmod.dll">
+      <Filter>Fmod</Filter>
+    </None>
+    <None Include="..\FMOD\fmod_dsp.cs">
+      <Filter>Fmod</Filter>
+    </None>
+    <None Include="..\FMOD\fmod_errors.cs">
+      <Filter>Fmod</Filter>
+    </None>
+    <None Include="..\FMOD\fmodL.dll">
+      <Filter>Fmod</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\Lib\fmod_vc.lib">
+      <Filter>Lib</Filter>
+    </Library>
+    <Library Include="..\Lib\fmodL_vc.lib">
+      <Filter>Lib</Filter>
+    </Library>
   </ItemGroup>
 </Project>

@@ -5,6 +5,14 @@
 #include <deque>
 #include "CheapTimer.h"
 
+// include 경로와 lib경로는 다르게 설정되어있다.
+//#include "../FMOD/fmod.hpp"
+//#pragma comment(lib, "Lib/fmodL_vc.lib")
+
+//포함 디렉토리 설정으로 인식성이 좋은 인클루드
+// cpp용 헤더
+#include <Fmod/fmod.hpp>
+
 namespace hady
 {
 	// 코드의 단순화를 위해 다양한 블록을 담는 4*4 구조체
@@ -194,7 +202,11 @@ namespace hady
 		virtual bool update() override;
 
 	public:
-		void musicOn();
+		void createAudioObjects(const std::string& AssetDir);
+		void playSound(FMOD::Sound* sound);
+		void playFastSound();
+		void releaseAudio();
+
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
@@ -271,5 +283,13 @@ namespace hady
 		CheapTimer				_bingoTimer{};
 		//double ended queue
 		std::deque<uint32>		_bingoLines{};
+
+	private:
+		FMOD::System*			_fmodSystem{};
+		FMOD::Sound*			_soundBg{};
+		FMOD::Sound*			_soundClear{};
+		FMOD::Sound*			_soundMove{};
+		FMOD::Sound*			_soundFastMove{};
+		FMOD::Channel*			_fmodChannelBg{};
 	};
 }

@@ -34,10 +34,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//처음 시작해주기
 	g_simpleTetris.restartGame();
 	
+	std::string AssetDir = "Asset/";
+	g_simpleTetris.createAudioObjects(AssetDir);
+
 	//레벨업 애니메이션 효과를 위한 timer클레스 선언
 	CheapTimer levelUpTimer{};
 	// milli 단위로 설정
 	levelUpTimer.set(1'500, CheapTimer::EUnit::milli);
+
 
 	//게임은 계속해서 업데이트가 되어야한다.
 	while (g_simpleTetris.update() == true)
@@ -46,10 +50,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		g_simpleTetris.updateGameLevel();
 
-		if (g_simpleTetris.isGameOver() == false)
-		{
-			g_simpleTetris.musicOn();
-		}
 		//gameover가 아닌 상황.
 		if (g_simpleTetris.isGameOver() == false)
 		{	// ????
@@ -86,9 +86,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					}
 					if (GetAsyncKeyState(VK_UP) == SHORT(0x8001))
 					{
+						g_simpleTetris.playFastSound();
 						while (g_simpleTetris.move(EDirection::S) == true)
 						{
-							
+
 						}
 					}
 					if (g_simpleTetris.tickGameSpeedTimer() == true)

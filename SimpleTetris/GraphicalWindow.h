@@ -216,8 +216,10 @@ namespace hady
 		const int32				g_kWidth{ 800 };
 		const int32				g_kHeight{ 600 };
 
-	private:
+	public:
 		HWND					_hWnd{};
+
+	private:
 		HDC						_frontDc{};
 		HDC						_backDc{};
 		HBITMAP					_backDcBitmap{};
