@@ -22,9 +22,13 @@ void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WND
 	{
 		// ???
 		createInternal(title, hInstance, windowProc);
-		// ???
+
+		// 시드 제공
 		srand(std::chrono::steady_clock::now().time_since_epoch().count());
 		
+		// 프로젝트 속성 - 디버깅 - 작업 디렉토리 설정 (상대 경로의 기준)
+		// 상대경로의 기준을 Project를 기준으로 하고싶다면 $(ProjectDir)
+		// 상대경로의 기준을 Solution를 기준으로 하고싶다면 $(SolutionDir)
 		createBlock(EBlockType::Used,	Color(100, 100, 100));
 		createBlock(EBlockType::I,		Color(060, 220, 255));
 		createBlock(EBlockType::T,		Color(160, 100, 255));
