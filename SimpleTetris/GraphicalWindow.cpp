@@ -86,11 +86,27 @@ hady::uint32 hady::IGraphicalWindow::createImageFromFile(const std::wstring& fil
 
 	int x{}, y{}, channelCount{};
 	auto pixels = stbi_load(fileNameA, &x, &y, &channelCount, 4);
+	assert(pixels != NULL);
+	
+	// RGBA로 들어온 픽셀 값을(pixels)
+	// BGRA로 (pixels_bgra) 바꿔준다.
+	const uint32 pixelCount{ (uint32)(x * y) };
+	uint8* pixels_bgra = new uint8[(uint64)pixelCount * channelCount];
+	for (uint32 iPixel = 0; iPixel < pixelCount; ++iPixel)
+	{
+		const uint64 iOffset = (uint64)iPixel * 4;
+		pixels_bgra[iOffset + 0] = pixels_bgra[iOffset + 2];
+		pixels_bgra[iOffset + 1] = pixels_bgra[iOffset + 1];
+		pixels_bgra[iOffset + 2] = pixels_bgra[iOffset + 0];
+		pixels_bgra[iOffset + 3] = pixels_bgra[iOffset + 3];
+	}
 
-	HBITMAP bitmap{ CreateBitmap(x, y, 1, channelCount * 8, pixels) };
+	//CtreateBitmap 함수는 채널 순서가 RGBA가 아니라 BGRA 값으로 받는다.
+	HBITMAP bitmap{ CreateBitmap(x, y, 1, channelCount * 8, pixels_bgra) };
 	_vImages.emplace_back(bitmap, Size2(static_cast<float>(x), static_cast<float>(y)));
 
 	stbi_image_free(pixels);
+	delete[] pixels_bgra;
 
 	return static_cast<uint32>(_vImages.size() - 1);
 }
