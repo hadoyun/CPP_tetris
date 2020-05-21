@@ -213,7 +213,9 @@ namespace hady
 		void releaseAudio();
 
 	public:
-		//void 
+		void holdBlock();
+
+		EBlockType getHoldBlock();
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
@@ -271,7 +273,9 @@ namespace hady
 		// 다음 블록을 나타내기 위한 블록 큐(의미상)
 		std::deque<EBlockType> _nextBlockQueue{};
 		// hold Block
-		EBlockType				_holdBlock{};
+		std::deque<EBlockType>	_holdBlock{};
+
+		bool					_isHold{ true };
 
 	private:
 		bool					_isGameOver{ false };

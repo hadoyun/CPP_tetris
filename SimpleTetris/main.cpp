@@ -42,7 +42,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// milli 단위로 설정
 	levelUpTimer.set(1'500, CheapTimer::EUnit::milli);
 
-
 	//게임은 계속해서 업데이트가 되어야한다.
 	while (g_simpleTetris.update() == true)
 	{
@@ -95,6 +94,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					if (g_simpleTetris.tickGameSpeedTimer() == true)
 					{
 						g_simpleTetris.move(EDirection::S);
+					}
+					if (GetAsyncKeyState('H') == SHORT(0x8001))
+					{
+						g_simpleTetris.holdBlock();
 					}
 				}
 				if (GetAsyncKeyState('P') == SHORT(0x8001))

@@ -256,6 +256,37 @@ void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WND
 				0, 0, 0, 0
 			);
 		}
+		
+		// Z자형 블록
+		{
+			_blocks[(int)EBlockType::Z][(int)EDirection::N].set(
+				0, 1, 0, 0,
+				1, 1, 0, 0,
+				1, 0, 0, 0,
+				0, 0, 0, 0
+			);
+
+			_blocks[(int)EBlockType::Z][(int)EDirection::W].set(
+				0, 0, 0, 0,
+				1, 1, 0, 0,
+				0, 1, 1, 0,
+				0, 0, 0, 0
+			);
+
+			_blocks[(int)EBlockType::Z][(int)EDirection::S].set(
+				0, 0, 1, 0,
+				0, 1, 1, 0,
+				0, 1, 0, 0,
+				0, 0, 0, 0
+			);
+
+			_blocks[(int)EBlockType::Z][(int)EDirection::E].set(
+				1, 1, 0, 0,
+				0, 1, 1, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0
+			);
+		}
 	}
 	updateNextblockQueue();
 }
@@ -316,6 +347,20 @@ void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bo
 	//다음 블록들
 	drawBlockToScreen(_nextBlockQueue[0], nextBLockPosition + kBlockSize, EDirection::N);
 	drawBlockToScreen(_nextBlockQueue[1], nextBLockPosition + Size2(kBlockSize.x, kBlockSize.y * 6), EDirection::N);
+
+	// hold block position
+	Position2 holdBLockPosition{ boardOffset + Position2(kBoardSizePixel.x + 30, 430) };
+	// 홀드 블록 테두리
+	drawRectangleToScreen(holdBLockPosition, kBlockSize * Size2(5, 6), borderColor);
+	// 홀드 블록 스크린
+	if (_holdBlock.size() <= 0)
+	{
+		drawBlockToScreen(EBlockType::Used, holdBLockPosition + kBlockSize, EDirection::N);
+	}
+	else if(_holdBlock.size() >= 1)
+	{
+		drawBlockToScreen(_holdBlock[0], holdBLockPosition + kBlockSize, EDirection::N);
+	}
 
 	for (float y = 0; y < kBoardSize.y; y += 1)
 	{
@@ -668,6 +713,8 @@ void hady::SimpleTetris::restartGame()
 	_nextBlockQueue.pop_front();
 	_nextBlockQueue.pop_front();
 
+	_holdBlock.clear();
+
 	_currScore = 0;
 	_comboCount = 0;
 }
@@ -976,4 +1023,38 @@ void hady::SimpleTetris::releaseAudio()
 	//_SoundItem->release();
 	
 	_fmodSystem->release();
+}
+
+void hady::SimpleTetris::holdBlock()
+{
+	//홀드 할때
+	if (_holdBlock.size() <= 0)
+	{
+		if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == true)
+		{
+			_holdBlock.emplace_back(_currBlockType);
+
+			_currBlockType = _nextBlockQueue.front();
+
+			_nextBlockQueue.pop_front();
+		}
+		else
+		{
+			__noop;
+		}
+	}
+	//홀드를 풀때
+	else if (_holdBlock.size() >= 1)
+	{
+		if (canDrawBlock(_holdBlock.front(), _currPosition, _currDirection) == true)
+		{
+			_currBlockType = _holdBlock.front();
+
+			_holdBlock.pop_front();
+		}
+		else
+		{
+			__noop;
+		}
+	}
 }
