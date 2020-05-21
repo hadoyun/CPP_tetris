@@ -94,6 +94,12 @@
     <Media Include="..\Asset\big_explosion.wav">
       <Filter>Asset</Filter>
     </Media>
+    <Media Include="..\Asset\Princess Maker 2 BGM Credit.mp3">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\move1.mp3">
+      <Filter>Asset</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FMOD\fmod.cs">

@@ -18,7 +18,6 @@ hady::SimpleTetris::~SimpleTetris()
 
 void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
-
 	{
 		// ???
 		createInternal(title, hInstance, windowProc);
@@ -306,6 +305,7 @@ void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bo
 	// 현재 블록
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
+	// 격자무늬 그리드 그리기 
 	drawGrid(boardOffset);
 
 	Position2 nextBLockPosition{ boardOffset + Position2(kBoardSizePixel.x + 30, 10) };
@@ -330,6 +330,7 @@ void hady::SimpleTetris::drawBoard(const Position2& boardOffset, const Color& bo
 		}
 	}
 
+	//가이드 블록 그리기
 	drawGuideBlock(boardOffset);
 }
 
@@ -421,6 +422,8 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 void hady::SimpleTetris::rotate(bool clockWise)
 {	//블록 지우기
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
+
+	playSound(_soundMove);
 
 	int32 currDirection{ int32(_currDirection) };
 
@@ -937,25 +940,27 @@ void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 	{
 		MessageBox(_hWnd, TEXT("시스템 초기화 실패"), TEXT("초기화 실패"), MB_ICONERROR);
 	}
-
-	if (_fmodSystem->createSound((AssetDir + "Kiryu Kyosuke Harmonica Theme Full.wav").c_str()
-		, FMOD_LOOP_NORMAL, nullptr, &_soundBg) != FMOD_OK)
-	{
-		MessageBox(_hWnd, TEXT("사운드 생성 실패"), TEXT("사운드 생성 실패"), MB_ICONERROR);
-	}
-
-	_fmodSystem->createSound((AssetDir + "big_explosion.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundClear) != FMOD_OK;
-	_fmodSystem->createSound((AssetDir + "small_explosion.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundMove) != FMOD_OK;
+	
+	//배경 bgm
+	_fmodSystem->createSound((AssetDir + "Princess Maker 2 BGM Credit.mp3").c_str(), FMOD_LOOP_NORMAL, nullptr, &_soundBg) != FMOD_OK;
+	// 라인 클리어 애니메이션 bgm
+	_fmodSystem->createSound((AssetDir + "dingdong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundClear) != FMOD_OK;
+	// 이동
+	_fmodSystem->createSound((AssetDir + "move1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundMove) != FMOD_OK;
+	// 빠른 이동
 	_fmodSystem->createSound((AssetDir + "laser_enemy.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFastMove) != FMOD_OK;
 
+	//배경음 플레이
 	playSound(_soundBg);
 }
+
 
 void hady::SimpleTetris::playSound(FMOD::Sound* sound)
 {
 	_fmodSystem->playSound(sound, nullptr, false, &_fmodChannelBg) == FMOD_OK;
 }
 
+// 
 void hady::SimpleTetris::playFastSound()
 {
 	_fmodSystem->playSound(_soundFastMove, nullptr, false, &_fmodChannelBg) == FMOD_OK;

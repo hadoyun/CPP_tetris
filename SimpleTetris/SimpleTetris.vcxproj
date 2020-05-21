@@ -167,6 +167,8 @@
     <Media Include="..\Asset\chillout_lonley_pad_meditation_karma_ron.mp3" />
     <Media Include="..\Asset\Kiryu Kyosuke Harmonica Theme Full.wav" />
     <Media Include="..\Asset\laser_enemy.wav" />
+    <Media Include="..\Asset\move1.mp3" />
+    <Media Include="..\Asset\Princess Maker 2 BGM Credit.mp3" />
     <Media Include="..\Asset\small_explosion.wav" />
   </ItemGroup>
   <ItemGroup>

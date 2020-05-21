@@ -202,11 +202,18 @@ namespace hady
 		virtual bool update() override;
 
 	public:
+		// _fmodSystem에 노래를 생성한다.
 		void createAudioObjects(const std::string& AssetDir);
+		// _fmodSystem에 생성된 사운드를 플레이한다.
 		void playSound(FMOD::Sound* sound);
+
 		void playFastSound();
+	private:
+		//RAII 함수 생성된 _fmodSystem과 채널들을 release 한다.
 		void releaseAudio();
 
+	public:
+		//void 
 
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
@@ -263,6 +270,8 @@ namespace hady
 	private:
 		// 다음 블록을 나타내기 위한 블록 큐(의미상)
 		std::deque<EBlockType> _nextBlockQueue{};
+		// hold Block
+		EBlockType				_holdBlock{};
 
 	private:
 		bool					_isGameOver{ false };
@@ -286,10 +295,12 @@ namespace hady
 
 	private:
 		FMOD::System*			_fmodSystem{};
+
 		FMOD::Sound*			_soundBg{};
 		FMOD::Sound*			_soundClear{};
 		FMOD::Sound*			_soundMove{};
 		FMOD::Sound*			_soundFastMove{};
+
 		FMOD::Channel*			_fmodChannelBg{};
 	};
 }

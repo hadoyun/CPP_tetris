@@ -2,8 +2,8 @@
 #include "CheapTimer.h"
 //shift+f12 : 참조검색. 해당 함수 혹은 변수가 사용된 위치를 알려줌.
 /*
-1. 콤보가 되었을 때, 화면에 띄워주기 
-3. 레벨업 이펙트 추가 
+1. 홀드 기능 만들기
+2. 
 */
 static constexpr hady::int32 g_kWidth{ 600 };
 static constexpr hady::int32 g_kHeight{ 1000 };
@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				EHorzAlign::Center, EVertAlign::Center);
 
 			g_simpleTetris.useFont(2);
-			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 5), L"FPS: " + std::to_wstring(g_simpleTetris.getFps()), difaultColor);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 05), L"FPS: "	  + std::to_wstring(g_simpleTetris.getFps()),		difaultColor);
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 25), L"SCORE: " + std::to_wstring(g_simpleTetris.getCurrScore()), difaultColor);
 			if (g_simpleTetris.getGameLevelUp() == true)
 			{
