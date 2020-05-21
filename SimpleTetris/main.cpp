@@ -3,8 +3,7 @@
 //shift+f12 : 참조검색. 해당 함수 혹은 변수가 사용된 위치를 알려줌.
 /*
 1. 홀드 기능 만들기
-2. clear bingo 소리가 묻힘
-3. 
+2. 
 */
 static constexpr hady::int32 g_kWidth{ 600 };
 static constexpr hady::int32 g_kHeight{ 1000 };
