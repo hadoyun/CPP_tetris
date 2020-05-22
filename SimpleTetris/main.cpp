@@ -2,8 +2,7 @@
 #include "CheapTimer.h"
 //shift+f12 : 참조검색. 해당 함수 혹은 변수가 사용된 위치를 알려줌.
 /*
-1. 홀드 기능 만들기
-2. 
+1 
 */
 static constexpr hady::int32 g_kWidth{ 600 };
 static constexpr hady::int32 g_kHeight{ 1000 };
@@ -18,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	using namespace hady;
 
-	g_simpleTetris.set(L"Simple Tetris", hInstance, WinProc);
+	g_simpleTetris.set(L"Tetris", hInstance, WinProc);
 
 	g_simpleTetris.addFont(L"Consolas", 20, false);
 	g_simpleTetris.addFont(L"Jokerman", 46, false);
@@ -158,16 +157,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 45), L"LEVEL: " + std::to_wstring(g_simpleTetris.getCurrLevel()), levelColor);
 			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 65), L"EXP: " + std::to_wstring(g_simpleTetris.getCurrLevelScore()), difaultColor);
 			
-			
 			g_simpleTetris.useFont(3);
-			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 465), L"COMBO " 
-				+ std::to_wstring(g_simpleTetris.getComboCount()), difaultColor);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 250, 465), L"HOLD ", difaultColor);
 
+			g_simpleTetris.useFont(3);
+			g_simpleTetris.drawTextToScreen(Position2(g_kWidth - 350, 700), L"COMBO " 
+				+ std::to_wstring(g_simpleTetris.getComboCount()), difaultColor);
+			
 			if (g_simpleTetris.isGameOver() == true)
 			{
 				g_simpleTetris.useFont(3);
 				g_simpleTetris.drawTextToScreen(Position2(0, 0), Size2(g_kWidth, g_kHeight), L"GAME OVER"
 					, difaultColor, EHorzAlign::Center, EVertAlign::Center);
+
 				if (GetAsyncKeyState('R') == SHORT(0x8001))
 				{
 					g_simpleTetris.restartGame();

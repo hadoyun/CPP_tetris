@@ -431,13 +431,12 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 			// 지워진 
 			setBlockToBoard(_currBlockType, _currPosition, _currDirection);
 
-			if (_currPosition == getInitialBlockPosition() && _pause == false) 
+			if (_currPosition == getInitialBlockPosition()) 
 			{
 				_isGameOver = true;
 			}
 
 			// 새 블록 스폰
-			
 			spawnNewBlock();
 
 			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == false)
@@ -555,7 +554,7 @@ const hady::Position2& hady::SimpleTetris::getCurrPosition() const
 {
 	return _currPosition;
 }
-
+// 사악한 디버깅용 함수
 void hady::SimpleTetris::setCurrBlockType(EBlockType eBlockType)
 {
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
@@ -597,7 +596,7 @@ void hady::SimpleTetris::updateNextblockQueue()
 	while (_nextBlockQueue.size() < kNextBlockQueueMinSize)
 	{
 		_nextBlockQueue.push_back(getRandomBlockType());
-		// ???
+		// 여유주기 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
@@ -694,10 +693,10 @@ void hady::SimpleTetris::restartGame()
 	}*/
 
 	//float * float은 연산 오버플로우가 발생하므로 앞의 하나를 double로 캐스팅 한다.
-	//보드를 비운다.
+	// 보드를 비운다.
 	memset(_board, 0, (size_t)((double)kBoardSize.x * kBoardSize.y));
 
-	//디버그용 블록
+	// 디버그용 블록
 #if defined DEBUG || _DEBUG
 	for (int y = kBoardSize.y - 1; y > kBoardSize.y - 4; --y)
 	{
@@ -754,6 +753,8 @@ void hady::SimpleTetris::spawnNewBlock()
 		break;
 	}
 	_currPosition = getInitialBlockPosition();
+	// 새 블록이 스폰 된 후에만 홀드가 가능하다.
+	_canHold = true;
 }
 
 // 새로운 시작 블록 포지션
@@ -875,7 +876,7 @@ void hady::SimpleTetris::drawBlockToScreen(EBlockType eBlockType, const Position
 {
 	int32 blockType{ (int32)eBlockType };
 	const auto& block{ _blocks[blockType][(uint32)eDirection] };
-
+	// 왜 += 1 일까?  === float 이기 때문!
 	for (float y = 0; y < kBlockContainerSize; y += 1)
 	{
 		for (float x = 0; x < kBlockContainerSize; x += 1)
@@ -989,13 +990,20 @@ void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 	}
 	
 	//배경 bgm
-	_fmodSystem->createSound((AssetDir + "Princess Maker 2 BGM Credit.mp3").c_str(), FMOD_LOOP_NORMAL, nullptr, &_soundBg) != FMOD_OK;
+	_fmodSystem->createSound((AssetDir + "Princess Maker 2 BGM Credit.mp3").c_str(), FMOD_LOOP_NORMAL, nullptr, &_soundBg);
 	// 라인 클리어 애니메이션 bgm
-	_fmodSystem->createSound((AssetDir + "dingdong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundClear) != FMOD_OK;
+	_fmodSystem->createSound((AssetDir + "Jump-SoundBible.com-1007297584.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundClear);
 	// 이동
-	_fmodSystem->createSound((AssetDir + "move1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundMove) != FMOD_OK;
+	_fmodSystem->createSound((AssetDir + "ppong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundMove);
 	// 빠른 이동
-	_fmodSystem->createSound((AssetDir + "laser_enemy.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFastMove) != FMOD_OK;
+	_fmodSystem->createSound((AssetDir + "move1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFastMove);
+	// 홀드 시 후일 교체 요망
+	_fmodSystem->createSound((AssetDir + "ppong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundHold);
+	// 실패
+	_fmodSystem->createSound((AssetDir + "ItemUpgrade_NoChange_1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFail);
+
+	// .. 디버깅용 효과음
+	_fmodSystem->createSound((AssetDir + "big_explosion.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundDebug);
 
 	//배경음 플레이
 	playSound(_soundBg);
@@ -1004,13 +1012,13 @@ void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 
 void hady::SimpleTetris::playSound(FMOD::Sound* sound)
 {
-	_fmodSystem->playSound(sound, nullptr, false, &_fmodChannelBg) == FMOD_OK;
+	_fmodSystem->playSound(sound, nullptr, false, &_fmodChannelBg);
 }
 
 // 
 void hady::SimpleTetris::playFastSound()
 {
-	_fmodSystem->playSound(_soundFastMove, nullptr, false, &_fmodChannelBg) == FMOD_OK;
+	_fmodSystem->playSound(_soundFastMove, nullptr, false, &_fmodChannelBg);
 }
 
 void hady::SimpleTetris::releaseAudio()
@@ -1027,34 +1035,56 @@ void hady::SimpleTetris::releaseAudio()
 
 void hady::SimpleTetris::holdBlock()
 {
-	//홀드 할때
-	if (_holdBlock.size() <= 0)
+	if (_canHold == true)
 	{
-		if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == true)
+		//처음 홀드 할때
+		if (_holdBlock.size() == 0)
 		{
-			_holdBlock.emplace_back(_currBlockType);
+			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == true)
+			{
+				playSound(_soundHold);
 
-			_currBlockType = _nextBlockQueue.front();
+				_holdBlock.emplace_back(_currBlockType);
 
-			_nextBlockQueue.pop_front();
+				_currBlockType = _nextBlockQueue.front();
+
+				_nextBlockQueue.pop_front();
+
+				_prevHoldBlock = _currBlockType;
+
+				_canHold = false;
+			}
+			else
+			{
+				__noop;
+			}
+		}
+		// 두번째 부터 홀드를 할때
+		else if (_prevHoldBlock != _currBlockType)
+		{
+			if (canDrawBlock(_holdBlock.front(), _currPosition, _currDirection) == true)
+			{
+				playSound(_soundHold);
+
+				_holdBlock.emplace_back(_currBlockType);
+
+				_currBlockType = _holdBlock.front();
+
+				_prevHoldBlock = _currBlockType;
+
+				_holdBlock.pop_front();
+
+				_canHold = false;
+			}
 		}
 		else
 		{
-			__noop;
+			playSound(_soundDebug);
 		}
+		
 	}
-	//홀드를 풀때
-	else if (_holdBlock.size() >= 1)
-	{
-		if (canDrawBlock(_holdBlock.front(), _currPosition, _currDirection) == true)
-		{
-			_currBlockType = _holdBlock.front();
-
-			_holdBlock.pop_front();
-		}
-		else
-		{
-			__noop;
-		}
+	else
+	{	// 홀드가 실패 했을 시 나오는 효과음
+		playSound(_soundFail);
 	}
 }

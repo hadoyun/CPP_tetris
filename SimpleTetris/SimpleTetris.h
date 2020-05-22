@@ -215,8 +215,6 @@ namespace hady
 	public:
 		void holdBlock();
 
-		EBlockType getHoldBlock();
-
 	public:
 		static constexpr Size2	kBlockSize{ 30, 30 };
 		static constexpr float	kBlockBorder{ 2 };
@@ -274,9 +272,8 @@ namespace hady
 		std::deque<EBlockType> _nextBlockQueue{};
 		// hold Block
 		std::deque<EBlockType>	_holdBlock{};
-
-		bool					_isHold{ true };
-
+		bool					_canHold{ true };
+		EBlockType				_prevHoldBlock{};
 	private:
 		bool					_isGameOver{ false };
 
@@ -304,6 +301,10 @@ namespace hady
 		FMOD::Sound*			_soundClear{};
 		FMOD::Sound*			_soundMove{};
 		FMOD::Sound*			_soundFastMove{};
+		FMOD::Sound*			_soundHold{};
+		FMOD::Sound*			_soundFail{};
+
+		FMOD::Sound*			_soundDebug{};
 
 		FMOD::Channel*			_fmodChannelBg{};
 	};

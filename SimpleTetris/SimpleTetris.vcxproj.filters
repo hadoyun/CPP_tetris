@@ -100,6 +100,15 @@
     <Media Include="..\Asset\move1.mp3">
       <Filter>Asset</Filter>
     </Media>
+    <Media Include="..\Asset\ppong.mp3">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\Jump-SoundBible.com-1007297584.mp3">
+      <Filter>Asset</Filter>
+    </Media>
+    <Media Include="..\Asset\ItemUpgrade_NoChange_1.mp3">
+      <Filter>Asset</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FMOD\fmod.cs">
