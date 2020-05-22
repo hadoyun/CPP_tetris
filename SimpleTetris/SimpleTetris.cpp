@@ -1070,9 +1070,9 @@ void hady::SimpleTetris::holdBlock()
 
 				_currBlockType = _holdBlock.front();
 
-				_prevHoldBlock = _currBlockType;
-
 				_holdBlock.pop_front();
+
+				_prevHoldBlock = _holdBlock.front();
 
 				_canHold = false;
 			}
