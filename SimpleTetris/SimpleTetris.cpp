@@ -5,6 +5,8 @@
 #include <string.h>
 
 
+#define RELEASE_FMOD(s) if (s != nullptr) { s->release(); s = nullptr; }
+
 
 hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
 {
@@ -13,7 +15,7 @@ hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(w
 
 hady::SimpleTetris::~SimpleTetris()
 {
-	releaseAudio();
+
 }
 
 void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
@@ -404,7 +406,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 	case hady::EDirection::N:
 		if (canDrawBlock(_currBlockType, _currPosition - Position2(0, 1), _currDirection) == true)
 		{	
-			playSound(_soundMove);
+			_audio.playSound("이동");
 			//이제 북쪽으론 움직이지 않기 때문에 필요 없다.
 			//_currPosition.y -= 1;
 			return true;
@@ -415,7 +417,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 		{	// 오른쪽으로 이동
 			
 			_currPosition.x += 1;
-			playSound(_soundMove);
+			_audio.playSound("이동");
 			return true;
 		}
 		break;
@@ -453,7 +455,7 @@ bool hady::SimpleTetris::move(EDirection eDirection)
 		if (canDrawBlock(_currBlockType, _currPosition - Position2(1, 0), _currDirection) == true)
 		{
 			_currPosition.x -= 1;
-			playSound(_soundMove);
+			_audio.playSound("이동");
 			return true;
 		}
 		break;
@@ -467,7 +469,7 @@ void hady::SimpleTetris::rotate(bool clockWise)
 {	//블록 지우기
 	setBlockToBoard(_currBlockType, _currPosition, _currDirection, true);
 
-	playSound(_soundMove);
+	_audio.playSound("이동");
 
 	int32 currDirection{ int32(_currDirection) };
 
@@ -817,7 +819,7 @@ void hady::SimpleTetris::changeBingoLineColor(int32 bingoedY)
 
 void hady::SimpleTetris::clearBingoLine(int32 bingoedY)
 {
-	_fmodSystem->playSound(_soundClear, nullptr, false, &_fmodChannelBg) != FMOD_OK;
+	_audio.playSound("빙고");
 
 	for (int32 y = bingoedY; y > -3; --y)
 	{
@@ -978,59 +980,21 @@ void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 	//release 모드에서 실행 하고 싶다면 assert 안에 넣으면 안됀다.
 
 	//밖에서 생성자 호출을하지 못하게 막아놓음 == > create 함수 사용
-	if(FMOD::System_Create(&_fmodSystem) != FMOD_OK)
-	{
-		MessageBox(_hWnd, TEXT("시스템 크리에이트 실패"), TEXT("크리에이트 실패"), MB_ICONERROR);
-	};
 
 	// 생성자를 호출하면 초기화도 해줘야지! 
-	if(_fmodSystem->init(32, FMOD_INIT_NORMAL, nullptr) != FMOD_OK)
-	{
-		MessageBox(_hWnd, TEXT("시스템 초기화 실패"), TEXT("초기화 실패"), MB_ICONERROR);
-	}
 	
-	//배경 bgm
-	_fmodSystem->createSound((AssetDir + "Princess Maker 2 BGM Credit.mp3").c_str(), FMOD_LOOP_NORMAL, nullptr, &_soundBg);
-	// 라인 클리어 애니메이션 bgm
-	_fmodSystem->createSound((AssetDir + "Jump-SoundBible.com-1007297584.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundClear);
-	// 이동
-	_fmodSystem->createSound((AssetDir + "ppong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundMove);
-	// 빠른 이동
-	_fmodSystem->createSound((AssetDir + "move1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFastMove);
-	// 홀드 시 후일 교체 요망
-	_fmodSystem->createSound((AssetDir + "ppong.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundHold);
-	// 실패
-	_fmodSystem->createSound((AssetDir + "ItemUpgrade_NoChange_1.mp3").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundFail);
-
-	// .. 디버깅용 효과음
-	_fmodSystem->createSound((AssetDir + "big_explosion.wav").c_str(), FMOD_DEFAULT | FMOD_NONBLOCKING, nullptr, &_soundDebug);
+	_audio.createSound(AssetDir + "Princess Maker 2 BGM Credit.mp3",				FMOD_LOOP_NORMAL,					 "배경음");
+	_audio.createSound(AssetDir + "Jump-SoundBible.com-1007297584.mp3",				FMOD_DEFAULT | FMOD_NONBLOCKING,	 "빙고");
+	_audio.createSound(AssetDir + "ppong.mp3",										FMOD_DEFAULT | FMOD_NONBLOCKING,	 "이동");
+	_audio.createSound(AssetDir + "move1.mp3",										FMOD_DEFAULT | FMOD_NONBLOCKING,	 "빠른이동");
+	_audio.createSound(AssetDir + "ppong.mp3",										FMOD_DEFAULT | FMOD_NONBLOCKING,	 "홀드");
+	_audio.createSound(AssetDir + "ItemUpgrade_NoChange_1.mp3",						FMOD_DEFAULT | FMOD_NONBLOCKING,	 "실패");
+	
+	_audio.createSound(AssetDir + "big_explosion.wav",								FMOD_DEFAULT | FMOD_NONBLOCKING,	 "디버깅 효과음");
+	_audio.createSound(AssetDir + "Kiryu Kyosuke Harmonica Theme Full.wav",			FMOD_DEFAULT | FMOD_NONBLOCKING,	 "배경음2");
 
 	//배경음 플레이
-	playSound(_soundBg);
-}
-
-
-void hady::SimpleTetris::playSound(FMOD::Sound* sound)
-{
-	_fmodSystem->playSound(sound, nullptr, false, &_fmodChannelBg);
-}
-
-// 
-void hady::SimpleTetris::playFastSound()
-{
-	_fmodSystem->playSound(_soundFastMove, nullptr, false, &_fmodChannelBg);
-}
-
-void hady::SimpleTetris::releaseAudio()
-{
-	_soundBg->release();
-	//_SoundLaser->release();
-	//_SoundExplosionBig->release();
-	//_SoundExplosionSmall->release();
-	
-	//_SoundItem->release();
-	
-	_fmodSystem->release();
+	_audio.playSound("배경음");
 }
 
 void hady::SimpleTetris::holdBlock()
@@ -1042,7 +1006,7 @@ void hady::SimpleTetris::holdBlock()
 		{
 			if (canDrawBlock(_currBlockType, _currPosition, _currDirection) == true)
 			{
-				playSound(_soundHold);
+				_audio.playSound("홀드");
 
 				_holdBlock.emplace_back(_currBlockType);
 
@@ -1064,7 +1028,7 @@ void hady::SimpleTetris::holdBlock()
 		{
 			if (canDrawBlock(_holdBlock.front(), _currPosition, _currDirection) == true)
 			{
-				playSound(_soundHold);
+				_audio.playSound("홀드");
 
 				_holdBlock.emplace_back(_currBlockType);
 
@@ -1079,12 +1043,12 @@ void hady::SimpleTetris::holdBlock()
 		}
 		else
 		{
-			playSound(_soundDebug);
+			_audio.playSound("디버깅 효과음");
 		}
 		
 	}
 	else
 	{	// 홀드가 실패 했을 시 나오는 효과음
-		playSound(_soundFail);
+		_audio.playSound("실패");
 	}
 }

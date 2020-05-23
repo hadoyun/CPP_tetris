@@ -1,4 +1,4 @@
-/* ======================================================================================== */
+﻿/* ======================================================================================== */
 /* FMOD Core API - DSP header file.                                                         */
 /* Copyright (c), Firelight Technologies Pty, Ltd. 2004-2019.                               */
 /*                                                                                          */
@@ -226,7 +226,7 @@ typedef struct FMOD_DSP_DESCRIPTION
     unsigned int                        version;
     int                                 numinputbuffers;
     int                                 numoutputbuffers;
-    FMOD_DSP_CREATE_CALLBACK            create;
+    FMOD_DSP_CREATE_CALLBACK            systemCreateAndInit;
     FMOD_DSP_RELEASE_CALLBACK           release;
     FMOD_DSP_RESET_CALLBACK             reset;
     FMOD_DSP_READ_CALLBACK              read;

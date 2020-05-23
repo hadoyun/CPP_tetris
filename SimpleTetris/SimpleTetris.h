@@ -12,6 +12,7 @@
 //포함 디렉토리 설정으로 인식성이 좋은 인클루드
 // cpp용 헤더
 #include <Fmod/fmod.hpp>
+#include <SimpleTetris/Audio.h>
 
 namespace hady
 {
@@ -204,13 +205,6 @@ namespace hady
 	public:
 		// _fmodSystem에 노래를 생성한다.
 		void createAudioObjects(const std::string& AssetDir);
-		// _fmodSystem에 생성된 사운드를 플레이한다.
-		void playSound(FMOD::Sound* sound);
-
-		void playFastSound();
-	private:
-		//RAII 함수 생성된 _fmodSystem과 채널들을 release 한다.
-		void releaseAudio();
 
 	public:
 		void holdBlock();
@@ -295,17 +289,21 @@ namespace hady
 		std::deque<uint32>		_bingoLines{};
 
 	private:
-		FMOD::System*			_fmodSystem{};
+		//FMOD::System*			_fmodSystem{};
 
-		FMOD::Sound*			_soundBg{};
-		FMOD::Sound*			_soundClear{};
-		FMOD::Sound*			_soundMove{};
-		FMOD::Sound*			_soundFastMove{};
-		FMOD::Sound*			_soundHold{};
-		FMOD::Sound*			_soundFail{};
+		//FMOD::Sound*			_soundBg{};
+		//FMOD::Sound*			_soundClear{};
+		//FMOD::Sound*			_soundMove{};
+		//FMOD::Sound*			_soundFastMove{};
+		//FMOD::Sound*			_soundHold{};
+		//FMOD::Sound*			_soundFail{};
 
-		FMOD::Sound*			_soundDebug{};
+		//FMOD::Sound*			_soundDebug{};
+		//FMOD::Sound*			_soundBg2{};
 
-		FMOD::Channel*			_fmodChannelBg{};
+		//FMOD::Channel*			_vChannel{};
+		//FMOD::Channel*			_fmodChannelEffect{};
+
+		Audio					_audio{};
 	};
 }

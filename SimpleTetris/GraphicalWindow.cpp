@@ -36,11 +36,21 @@ void hady::IGraphicalWindow::createInternal(const std::wstring& title, HINSTANCE
 	windowClass.style = CS_VREDRAW | CS_HREDRAW;
 	RegisterClassExW(&windowClass);
 
+	DWORD windowStyle = WS_CAPTION;
+
 	// 윈도우를 생성한다
 	RECT windowRect{ 0, 0, 800, 600 };
-	_hWnd = CreateWindowExW(0, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED,
+	_hWnd = CreateWindowExW(0, windowClass.lpszClassName, windowClass.lpszClassName, windowStyle,
 		CW_USEDEFAULT, CW_USEDEFAULT, g_kWidth, g_kHeight,
 		nullptr, nullptr, hInstance, nullptr);
+
+	GetWindowRect(_hWnd, &windowRect);
+	// 처음에 입력한 값은 윈도우 전체의 크기 (테두리 .. 등등 포함)이기 때문에 실제 그려지는 크기는 더 작다.
+	// 윈도우 렉트에 알맞은 값을 넣어준다.
+	AdjustWindowRect(&windowRect, windowStyle, FALSE);
+
+	MoveWindow(_hWnd, windowRect.left, windowRect.top, windowRect.right - windowRect.left,
+		windowRect.bottom - windowRect.top, TRUE);
 
 	// 윈도우를 보여준다.
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);

@@ -36,6 +36,9 @@
     <ClCompile Include="CheapTimer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SimpleTetris.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\FMOD\fmod_output.h">
       <Filter>Fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

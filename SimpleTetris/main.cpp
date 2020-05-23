@@ -5,7 +5,7 @@
 1 
 */
 static constexpr hady::int32 g_kWidth{ 600 };
-static constexpr hady::int32 g_kHeight{ 1000 };
+static constexpr hady::int32 g_kHeight{ 750 };
 static hady::SimpleTetris g_simpleTetris{ g_kWidth, g_kHeight };
 
 LRESULT WINAPI WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -23,7 +23,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_simpleTetris.addFont(L"Jokerman", 46, false);
 	g_simpleTetris.addFont(L"휴먼매직체", 20, true);
 	g_simpleTetris.addFont(L"휴먼매직체", 45, true);
-	g_simpleTetris.addFont(L"굴림체", 85, true);
+	g_simpleTetris.addFont(L"굴림체", 125, true);
 
 	const Position2 boardPosition{ 10, 80 };
 	Color clearColor{ 240, 240, 255 };
@@ -84,7 +84,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					}
 					if (GetAsyncKeyState(VK_UP) == SHORT(0x8001))
 					{
-						g_simpleTetris.playFastSound();
 						while (g_simpleTetris.move(EDirection::S) == true)
 						{
 
@@ -98,11 +97,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					{
 						g_simpleTetris.holdBlock();
 					}
+					if (GetAsyncKeyState('M') == SHORT(0x8001))
+					{
+						
+					}
 				}
 				if (GetAsyncKeyState('P') == SHORT(0x8001))
 				{	//토클
 					g_simpleTetris.togglePause();
-				}
+				}				
+
 
 #if defined DEBUG || _DEBUG
 				if (GetAsyncKeyState('W') == SHORT(0x8001))

@@ -145,6 +145,7 @@
     <ClCompile Include="CheapTimer.cpp" />
     <ClCompile Include="GraphicalWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="SimpleTetris.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +160,7 @@
     <ClInclude Include="CheapTimer.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="GraphicalWindow.h" />
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="SimpleTetris.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
