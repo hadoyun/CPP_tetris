@@ -23,6 +23,7 @@ namespace hady
 		
 		void stopSound(const std::string& soundKey);
 
+		// 생성된 사운드와 음악을 해제한다.
 		void release();
 
 	private:
@@ -34,8 +35,4 @@ namespace hady
 
 		std::unordered_map<std::string, size_t> _soundMap{};
 	};
-
-
-
-
 }

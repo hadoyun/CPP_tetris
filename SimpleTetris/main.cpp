@@ -27,6 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	const Position2 boardPosition{ 10, 80 };
 	Color clearColor{ 240, 240, 255 };
+
 	const Color difaultColor{ 0, 0, 100 };
 	Color levelColor{ difaultColor };
 

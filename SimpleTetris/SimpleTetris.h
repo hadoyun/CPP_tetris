@@ -206,6 +206,8 @@ namespace hady
 		// _fmodSystem에 노래를 생성한다.
 		void createAudioObjects(const std::string& AssetDir);
 
+		void stopSound(const std::string& soundKind);
+
 	public:
 		void holdBlock();
 
@@ -271,8 +273,6 @@ namespace hady
 	private:
 		bool					_isGameOver{ false };
 
-		//uint8 _blockspwansCounts[uint32(EBlockType::MAX)][uint32(EBlockType::MAX)]{};
-
 		mutable bool			_pause{ false };
 
 	private:
@@ -289,21 +289,6 @@ namespace hady
 		std::deque<uint32>		_bingoLines{};
 
 	private:
-		//FMOD::System*			_fmodSystem{};
-
-		//FMOD::Sound*			_soundBg{};
-		//FMOD::Sound*			_soundClear{};
-		//FMOD::Sound*			_soundMove{};
-		//FMOD::Sound*			_soundFastMove{};
-		//FMOD::Sound*			_soundHold{};
-		//FMOD::Sound*			_soundFail{};
-
-		//FMOD::Sound*			_soundDebug{};
-		//FMOD::Sound*			_soundBg2{};
-
-		//FMOD::Channel*			_vChannel{};
-		//FMOD::Channel*			_fmodChannelEffect{};
-
 		Audio					_audio{};
 	};
 }

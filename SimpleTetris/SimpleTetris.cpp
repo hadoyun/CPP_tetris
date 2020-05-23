@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#define RELEASE_FMOD(s) if (s != nullptr) { s->release(); s = nullptr; }
+
 
 
 hady::SimpleTetris::SimpleTetris(int32 width, int32 height) : IGraphicalWindow(width, height)
@@ -21,7 +21,7 @@ hady::SimpleTetris::~SimpleTetris()
 void hady::SimpleTetris::set(const std::wstring& title, HINSTANCE hInstance, WNDPROC windowProc)
 {
 	{
-		// ???
+		// create 내부 함수 
 		createInternal(title, hInstance, windowProc);
 
 		// 시드 제공
@@ -976,13 +976,7 @@ bool hady::SimpleTetris::update()
 
 void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 {
-	//assert안에 들어간 줄은 release 모드에서는 작동이 되지 않는다.
-	//release 모드에서 실행 하고 싶다면 assert 안에 넣으면 안됀다.
-
-	//밖에서 생성자 호출을하지 못하게 막아놓음 == > create 함수 사용
-
 	// 생성자를 호출하면 초기화도 해줘야지! 
-	
 	_audio.createSound(AssetDir + "Princess Maker 2 BGM Credit.mp3",				FMOD_LOOP_NORMAL,					 "배경음");
 	_audio.createSound(AssetDir + "Jump-SoundBible.com-1007297584.mp3",				FMOD_DEFAULT | FMOD_NONBLOCKING,	 "빙고");
 	_audio.createSound(AssetDir + "ppong.mp3",										FMOD_DEFAULT | FMOD_NONBLOCKING,	 "이동");
@@ -995,6 +989,11 @@ void hady::SimpleTetris::createAudioObjects(const std::string& AssetDir)
 
 	//배경음 플레이
 	_audio.playSound("배경음");
+}
+
+void hady::SimpleTetris::stopSound(const std::string& soundKind)
+{
+	_audio.stopSound(soundKind);
 }
 
 void hady::SimpleTetris::holdBlock()
